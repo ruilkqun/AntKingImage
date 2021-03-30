@@ -1,0 +1,18 @@
+[package]
+name = "zhangwuji"
+version = "0.1.0"
+authors = ["lurui <lurui@ipfsforce.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# 镜像数据库
+sled = "0.34.6"
+byteorder = "1.4.3"
+zerocopy = "0.3.0"
+
+# 序列化
+serde = { version = "*", features = ["derive"] }
+serde_derive = "*"
+serde_json = "*"
