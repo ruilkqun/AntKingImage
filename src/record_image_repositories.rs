@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::sled_json::{TreeWrapper, JSONEncoder, IVecWrapper};
+use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::{ ImageVersionJSONValue };
 
 pub fn record_image_repositories(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> sled::Result<()> {
@@ -8,7 +8,7 @@ pub fn record_image_repositories(db: &sled::Db,image_name:String,image_version:S
         db.open_tree("image_repositories")?,
     );
 
-    let mut value = tree
+    let value = tree
     .get(image_name.clone());
 
     let mut image_repositories_json_value:ImageVersionJSONValue = ImageVersionJSONValue::default();
