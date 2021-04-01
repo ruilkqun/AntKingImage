@@ -7,6 +7,7 @@ use std::fs;
 use std::io::prelude::*;
 use serde_json::Value;
 use sha256::digest;
+use crate::get_layers::get_layers;
 
 
 // 写入当前镜像的配置json文件
@@ -71,7 +72,7 @@ pub async fn write_config_json(repositories_url_ip:String,image_name:String,imag
 }
 
 // 读取当前镜像的配置json文件
-pub async fn read_config_json(image_digest:String)  {
+pub async fn read_config_json(repositories_url_ip:String,image_name:String,image_digest:String)  {
     let image_storage_path_1 = image_digest.split(':');
     let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();
     let image_storage_path_3 = image_storage_path_2[1];
@@ -83,6 +84,17 @@ pub async fn read_config_json(image_digest:String)  {
             match v {
                 Ok(res1) => {
                     let v1:Value = res1;
+                    // let layer_1 = format!("{}",v1["rootfs"]["diff_ids"]);
+                    // let layer_2 = layer_1.split(',');
+                    // let layer_3: Vec<&str> = layer_2.collect();
+                    //
+                    // for i in 0..layer_3.len(){
+                    //     let layer_digest_1 = format!("{}",v1["rootfs"]["diff_ids"][i]);
+                    //     let layer_digest_2 = layer_digest_1.split('"');
+                    //     let layer_digest_3: Vec<&str> = layer_digest_2.collect();
+                    //     let layer_digest = format!("{}",layer_digest_3[1]);
+                    //     get_layers(repositories_url_ip.clone(),image_name.clone(),image_digest.clone(),layer_digest.clone()).await;
+                    // }
                     println!("layers diff_ids:{}",v1["rootfs"]["diff_ids"][0])
                 }
                 _ => {}

@@ -5,10 +5,23 @@ use std::fs;
 use std::io::prelude::*;
 use sha256::digest_bytes;
 use std::process::Command;
+use crate::get_manifest::get_manifest_info;
+
+pub async fn get_layers_all(repositories_url_ip:String,image_name:String,image_version:String){
+        match get_manifest_info(repositories_url_ip.clone(),image_name.clone(),image_version.clone()).await {
+        Ok(res) => {
+            for i in 0..res.layers.len() {
+                get_layers(repositories_url_ip.clone(),image_name.clone(),res.config.digest.clone(),res.layers[i].digest.clone()).await;
+            }
+        },
+        _ => {}
+    }
+}
 
 
 pub async fn get_layers(repositories_url_ip:String,image_name:String,image_digest:String,layer_digest:String)  {
     let url = format!("{}/v2/{}/blobs/{}", repositories_url_ip, image_name, layer_digest);
+    println!("get_layers_url:{}",url);
     let client = reqwest::Client::new();
 
     let mut headers = HeaderMap::new();
@@ -49,6 +62,10 @@ pub async fn get_layers(repositories_url_ip:String,image_name:String,image_diges
                         Ok(r2) => {
                             if r2 > 0 {
                                 let image_layer_sha256 = format!("sha256:{}",digest_bytes(&*fs::read(path.clone()).unwrap()));
+
+                                println!("image_layer_sha256:{}",image_layer_sha256);
+                                println!("layer_digest:{}",layer_digest);
+
                                 if image_layer_sha256 == layer_digest {
                                     println!("Download image layer successfully！");
                                     let output1 = Command::new("gzip").arg("-d").arg(path.clone()).output();

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::{ ImageVersionJSONValue };
 
-pub fn record_image_repositories(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> sled::Result<()> {
+pub async fn record_image_repositories(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> sled::Result<()> {
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
     let tree = TreeWrapper::<JSONEncoder<ImageVersionJSONValue>, JSONEncoder<ImageVersionJSONValue>>::new(
         db.open_tree("image_repositories")?,
