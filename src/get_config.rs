@@ -6,6 +6,7 @@ use std::fs::File;
 use std::fs;
 use std::io::prelude::*;
 use serde_json::Value;
+use sha256::digest;
 
 
 // 写入当前镜像的配置json文件
@@ -19,13 +20,20 @@ pub async fn write_config_json(repositories_url_ip:String,image_name:String,imag
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
 
 
-    let path = format!("./{}.json",image_digest.clone());
+
+    let image_storage_path_1 = image_digest.split(':');
+    let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();
+    let image_storage_path_3 = image_storage_path_2[1];
+    let image_storage_path = format!("{}",image_storage_path_3.clone());
+    fs::create_dir_all(image_storage_path.clone()).unwrap();
+    let path = format!("{}/{}.json",image_storage_path_3.clone(),image_storage_path_3.clone());
+    // println!("config.json path:{}",path);
     match fs::remove_file(path.clone()) {
         Ok(()) => {
-            println!("删除 以前 镜像配置文件 成功！")
+            println!("Delete previous image profile successfully！")
         },
         Err(e) => {
-            println!("删除 以前 镜像配置文件 失败! 原因：{}",e)
+            println!("Failed to delete previous image configuration file! Reason：{}",e)
         }
     }
     let mut file = File::create(path.clone()).unwrap();
@@ -38,13 +46,18 @@ pub async fn write_config_json(repositories_url_ip:String,image_name:String,imag
                     match write_result {
                         Ok(r2) => {
                             if r2 > 0 {
-                                println!("下载镜像配置文件 成功！")
+                                let config_json_sha256 = format!("sha256:{}",digest(fs::read_to_string(path.clone()).unwrap()));
+                                if config_json_sha256 == image_digest {
+                                    println!("Download image configuration file successfully！")
+                                }else {
+                                    println!("Failed to download image configuration file! Reason: sha256 is not match")
+                                }
                             }else {
-                                println!("镜像配置文件 为空！")
+                                println!("The image configuration file is empty！")
                             }
                         }
                         Err(e) => {
-                            println!("下载镜像配置文件 失败！原因：{}",e)
+                            println!("Failed to download image configuration file! Reason：{}",e)
                         }
                     }
                 }
@@ -52,14 +65,17 @@ pub async fn write_config_json(repositories_url_ip:String,image_name:String,imag
             }
         },
         Err(e) => {
-            println!("下载镜像配置文件 失败！原因：{}",e)
+            println!("Failed to download image configuration file! Reason：{}",e)
         }
     }
 }
 
 // 读取当前镜像的配置json文件
 pub async fn read_config_json(image_digest:String)  {
-    let path = format!("./{}.json",image_digest.clone());
+    let image_storage_path_1 = image_digest.split(':');
+    let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();
+    let image_storage_path_3 = image_storage_path_2[1];
+    let path = format!("{}/{}.json",image_storage_path_3.clone(),image_storage_path_3.clone());
     let read_result = fs::read_to_string(path.clone());
     match read_result {
         Ok(res) => {

@@ -20,3 +20,6 @@ serde_json = "*"
 # HTTP请求
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
+
+# 加解密
+sha256 = "1.0.0"

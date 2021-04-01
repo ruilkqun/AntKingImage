@@ -45,7 +45,7 @@ pub async fn main() -> sled::Result<()> {
     }
     write_config_json("http://192.168.1.118:8899".to_string(),"saodiseng/nginx".to_string(),image_digest.clone()).await;
     read_config_json(image_digest.clone()).await;
-    get_layers("http://192.168.1.118:8899".to_string(),"saodiseng/nginx".to_string(),"sha256:6f28985ad1843afd6fd4fe0b42a30bfab63c27d302362e7341e3316e8ba25ced".to_string()).await;
+    get_layers("http://192.168.1.118:8899".to_string(),"saodiseng/nginx".to_string(),image_digest.clone(),"sha256:6f28985ad1843afd6fd4fe0b42a30bfab63c27d302362e7341e3316e8ba25ced".to_string()).await;
 
     Ok(())
 }
