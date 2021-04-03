@@ -11,7 +11,7 @@ pub async fn record_image_repositories(db: &sled::Db,image_name:String,image_ver
     let value = tree
     .get(image_name.clone());
 
-    let mut image_repositories_json_value:ImageVersionJSONValue = ImageVersionJSONValue::default();
+    let  image_repositories_json_value:ImageVersionJSONValue;
     match value {
         Ok(res) => {
             match res {

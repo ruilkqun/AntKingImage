@@ -7,11 +7,10 @@ use std::fs;
 use std::io::prelude::*;
 use serde_json::Value;
 use sha256::digest;
-use crate::get_layers::get_layers;
 
 
 // 写入当前镜像的配置json文件
-pub async fn write_config_json(repositories_url_ip:String,image_name:String,image_digest:String)  {
+pub async fn write_config_json(repositories_url_ip:String,username:String,password:String,image_name:String,image_digest:String)  {
     let url = format!("{}/v2/{}/blobs/{}",repositories_url_ip.clone(),image_name.clone(),image_digest.clone());
     let client = reqwest::Client::new();
 
@@ -20,26 +19,27 @@ pub async fn write_config_json(repositories_url_ip:String,image_name:String,imag
     headers.insert("Content-Type", "application/vnd.docker.container.image.v1+json".parse().unwrap());
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
 
-
-
     let image_storage_path_1 = image_digest.split(':');
     let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();
     let image_storage_path_3 = image_storage_path_2[1];
-    let image_storage_path = format!("{}",image_storage_path_3.clone());
+    let image_storage_path_4 = format!("{}",image_storage_path_3.clone());
+
+    let image_storage_path = format!("/var/lib/AntKing/images/{}",image_storage_path_4);
     fs::create_dir_all(image_storage_path.clone()).unwrap();
-    let path = format!("{}/{}.json",image_storage_path_3.clone(),image_storage_path_3.clone());
+
+    let path = format!("{}/{}.json",image_storage_path.clone(),image_storage_path_4.clone());
     // println!("config.json path:{}",path);
-    match fs::remove_file(path.clone()) {
-        Ok(()) => {
-            println!("Delete previous image profile successfully！")
-        },
-        Err(e) => {
-            println!("Failed to delete previous image configuration file! Reason：{}",e)
-        }
-    }
+    // match fs::remove_file(path.clone()) {
+    //     Ok(()) => {
+    //         println!("Delete previous image profile successfully！")
+    //     },
+    //     Err(e) => {
+    //         println!("Failed to delete previous image configuration file! Reason：{}",e)
+    //     }
+    // }
     let mut file = File::create(path.clone()).unwrap();
 
-    match client.get(url).basic_auth("admin",Some("saodiseng")).headers(headers).timeout(std::time::Duration::from_secs(5)).send().await {
+    match client.get(url).basic_auth(username,Some(password)).headers(headers).timeout(std::time::Duration::from_secs(5)).send().await {
         Ok(r) => {
             match r.bytes().await {
                 Ok(r1) => {
@@ -72,11 +72,16 @@ pub async fn write_config_json(repositories_url_ip:String,image_name:String,imag
 }
 
 // 读取当前镜像的配置json文件
-pub async fn read_config_json(repositories_url_ip:String,image_name:String,image_digest:String)  {
-    let image_storage_path_1 = image_digest.split(':');
-    let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();
-    let image_storage_path_3 = image_storage_path_2[1];
-    let path = format!("{}/{}.json",image_storage_path_3.clone(),image_storage_path_3.clone());
+pub async fn read_config_json(image_digest:String) -> Value {
+    // let image_storage_path_1 = image_digest.split(':');
+    // let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();
+    // let image_storage_path_3 = image_storage_path_2[1];
+    // let image_storage_path_4 = format!("{}",image_storage_path_3.clone());
+
+    // let image_storage_path = format!("/var/lib/AntKing/images/{}",image_storage_path_4);
+    let image_storage_path = format!("/var/lib/AntKing/images/{}",image_digest);
+
+    let path = format!("{}/{}.json",image_storage_path.clone(),image_digest.clone());
     let read_result = fs::read_to_string(path.clone());
     match read_result {
         Ok(res) => {
@@ -84,6 +89,7 @@ pub async fn read_config_json(repositories_url_ip:String,image_name:String,image
             match v {
                 Ok(res1) => {
                     let v1:Value = res1;
+                    v1
                     // let layer_1 = format!("{}",v1["rootfs"]["diff_ids"]);
                     // let layer_2 = layer_1.split(',');
                     // let layer_3: Vec<&str> = layer_2.collect();
@@ -95,13 +101,17 @@ pub async fn read_config_json(repositories_url_ip:String,image_name:String,image
                     //     let layer_digest = format!("{}",layer_digest_3[1]);
                     //     get_layers(repositories_url_ip.clone(),image_name.clone(),image_digest.clone(),layer_digest.clone()).await;
                     // }
-                    println!("layers diff_ids:{}",v1["rootfs"]["diff_ids"][0])
+                    // println!("layers diff_ids:{}",v1["rootfs"]["diff_ids"][0])
                 }
-                _ => {}
+                _ => {
+                    Value::default()
+                }
             }
         },
 
-        _ => {}
+        _ => {
+            Value::default()
+        }
     }
 }
 
@@ -189,7 +199,7 @@ pub struct Rootfs {
 
 
 
-pub async fn get_config_info(repositories_url_ip:String,image_name:String,image_digest:String) -> Result<Manifest, Box<dyn Error>> {
+pub async fn get_config_info(repositories_url_ip:String,username:String,password:String,image_name:String,image_digest:String) -> Result<Manifest, Box<dyn Error>> {
     let url = format!("{}/v2/{}/blobs/{}",repositories_url_ip,image_name,image_digest);
     let client = reqwest::Client::new();
 
@@ -199,7 +209,7 @@ pub async fn get_config_info(repositories_url_ip:String,image_name:String,image_
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
 
 
-    match client.get(url).basic_auth("admin",Some("saodiseng")).headers(headers).timeout(std::time::Duration::from_secs(5)).send().await {
+    match client.get(url).basic_auth(username,Some(password)).headers(headers).timeout(std::time::Duration::from_secs(5)).send().await {
         Ok(r) => {
             match r.json().await {
                 Ok(res) => Ok(res),

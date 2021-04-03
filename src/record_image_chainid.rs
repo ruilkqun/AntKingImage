@@ -1,3 +1,4 @@
+#![allow(unused_assignments)]
 use std::collections::HashMap;
 use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::{ ImageChainIDJSONValue,ImageChainIDItemJSONValue };

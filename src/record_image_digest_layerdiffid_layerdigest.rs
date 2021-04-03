@@ -10,7 +10,7 @@ pub async fn record_image_digest_layer_diff_id_to_layer_digest(db: &sled::Db,ima
     let value = tree
     .get(image_digest.clone());
 
-    let mut image_digest_json_value = ImageLayerLayerDiffIDToLayerDigestJSONValue::default();
+    let image_digest_json_value;
     match value {
         Ok(res) => {
             match res {
@@ -71,7 +71,7 @@ pub async fn record_image_digest_layer_digest_layer_diff_id(db: &sled::Db,image_
     let value = tree
     .get(image_digest.clone());
 
-    let mut image_digest_json_value = ImageLayerLayerDigestToLayerDiffIDJSONValue::default();
+    let image_digest_json_value;
     match value {
         Ok(res) => {
             match res {

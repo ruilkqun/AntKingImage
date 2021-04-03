@@ -14,7 +14,7 @@ pub async fn record_image_layer_diff_id_to_level(db: &sled::Db,image_digest:Stri
 
     let layer_level = format!("{}",layer_level);
 
-    let mut image_digest_json_value = ImageLayerLevelJSONValue::default();
+    let image_digest_json_value;
     match value {
         Ok(res) => {
             match res {

@@ -4,7 +4,6 @@ use crate::public_struct::{ ImageVersionJSONValue };
 
 pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> bool{
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
-
     let tree_tmp = match db.open_tree("image_repositories") {
         sled::Result::Ok(res) => {
             res
