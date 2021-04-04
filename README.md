@@ -1,6 +1,19 @@
 # AntKingImage (OCI镜像拉取，存储)
-
 ```
+A Library For Download OCI Image
+
+Example:
+
+1、Downloade DockerHub Image
+
+   cri_pull_image("".to_string,"".to_string,"".to_string,image_name,image_version,docker:true).await.unwrap;
+
+2、Download Registry Image
+
+   cri_pull_image(repositories_url_ip,username,password,image_name,image_version,docker:true).await.unwrap;
+
+3、运行
+
 Download image configuration file successfully！
 [00:00:04] ======================================== 27092654/27092654 000eee12ec04cc914bf96e8f5dee7767510c2aca3816af6078bd9fbe3150920c downloaded
 [00:00:06] ======================================== 23741065/23741065 eb22865337de3edb54ec8b52f6c06de320f415e7ec43f01426fdafb8df6d6eb7 downloaded
