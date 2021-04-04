@@ -19,9 +19,9 @@ license = "MIT"
 sled = "0.34.6"
 
 # 序列化
-serde = { version = "*", features = ["derive"] }
-serde_derive = "*"
-serde_json = "*"
+serde = { version = "1.0.125", features = ["derive"] }
+serde_derive = "1.0.125"
+serde_json = "1.0.64"
 
 # HTTP请求
 reqwest = { version = "0.11", features = ["json"] }
