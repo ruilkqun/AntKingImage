@@ -1,8 +1,11 @@
 [package]
-name = "AntKingImage"
+name = "ant_king_image"
 version = "0.1.0"
 authors = ["lurui <lurui@ipfsforce.com>"]
 edition = "2018"
+description = "A Library For Download OCI Image."
+repository = "https://github.com/ruilkqun/AntKingImage.git"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 #[dependencies.rusty_pool]
@@ -14,8 +17,6 @@ edition = "2018"
 [dependencies]
 # 镜像数据库
 sled = "0.34.6"
-byteorder = "1.4.3"
-zerocopy = "0.3.0"
 
 # 序列化
 serde = { version = "*", features = ["derive"] }
@@ -31,6 +32,7 @@ sha256 = "1.0.0"
 
 # 进度条
 indicatif = "0.15.0"
+#indicatif = { git = "https://github.com/mitsuhiko/indicatif.git", tag = "0.15.0", version =  "0.15.0" }
 
 
 
