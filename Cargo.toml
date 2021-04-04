@@ -5,6 +5,11 @@ authors = ["lurui <lurui@ipfsforce.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+#[dependencies.rusty_pool]
+## 线程池
+#version = "0.5.1"
+#default-features = false
+
 
 [dependencies]
 # 镜像数据库
@@ -23,3 +28,9 @@ tokio = { version = "1", features = ["full"] }
 
 # 加解密
 sha256 = "1.0.0"
+
+# 进度条
+indicatif = "0.15.0"
+
+
+

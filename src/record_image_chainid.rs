@@ -71,13 +71,13 @@ pub async fn record_image_chain_id(db: &sled::Db,image_digest:String,image_chain
     };
 
     tree.insert(image_digest.clone(), &image_digest_json_value)?;
-    let value1 = tree
-        .get(image_digest.clone())?
-        .expect("Value not found")
-        .decode()
-        .expect("Decoding failed");
+    // let value1 = tree
+    //     .get(image_digest.clone())?
+    //     .expect("Value not found")
+    //     .decode()
+    //     .expect("Decoding failed");
     // assert_eq!(value, image_repositories_json_value);
-    println!("image_digest:{:?}",value1);
+    // println!("image_digest:{:?}",value1);
     // println!("image_version:{:?}",value.image_version["nginx:latest"]);
     Ok(())
 }

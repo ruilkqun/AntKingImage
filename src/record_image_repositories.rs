@@ -51,13 +51,13 @@ pub async fn record_image_repositories(db: &sled::Db,image_name:String,image_ver
     };
 
     tree.insert(image_name.clone(), &image_repositories_json_value)?;
-    let value1 = tree
-        .get(image_name.clone())?
-        .expect("Value not found")
-        .decode()
-        .expect("Decoding failed");
+    // let value1 = tree
+    //     .get(image_name.clone())?
+    //     .expect("Value not found")
+    //     .decode()
+    //     .expect("Decoding failed");
     // assert_eq!(value, image_repositories_json_value);
-    println!("image_version:{:?}",value1);
+    // println!("image_version:{:?}",value1);
     // println!("image_version:{:?}",value.image_version["nginx:latest"]);
     Ok(())
 }

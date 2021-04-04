@@ -24,9 +24,9 @@ pub async fn main() -> sled::Result<()> {
 
     let repositories_url_ip = "http://192.168.1.118:8899".to_string();
     let image_name = "saodiseng/nginx".to_string();
-    let image_version = "latest".to_string();
-    let username = "admin".to_string();
-    let password = "saodiseng".to_string();
+    let image_version = "hi".to_string();
+    let username = "".to_string();
+    let password = "".to_string();
     pull_image(&db,repositories_url_ip,image_name,image_version,username,password).await;
 
     Ok(())
