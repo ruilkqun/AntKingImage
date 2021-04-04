@@ -10,6 +10,11 @@ pub mod record_image_chainid;
 pub mod record_image_layer_level;
 pub mod utils;
 pub mod entrypoint;
+pub mod get_image_digest_dockerhub;
+pub mod get_manifest_dockerhub;
+pub mod get_token_dockerhub;
+pub mod get_config_dockerhub;
+pub mod get_layers_dockerhub;
 
 use sled::{ Config, Mode };
 use entrypoint::pull_image;
@@ -23,11 +28,14 @@ pub async fn main() -> sled::Result<()> {
     .open()?;
 
     let repositories_url_ip = "http://192.168.1.118:8899".to_string();
-    let image_name = "saodiseng/nginx".to_string();
-    let image_version = "hi".to_string();
+    // let image_name = "saodiseng/nginx".to_string();
+    // let image_version = "hi".to_string();
+    let image_name = "ruilkyu/nginx".to_string();
+    let image_version = "latest".to_string();
     let username = "".to_string();
     let password = "".to_string();
-    pull_image(&db,repositories_url_ip,image_name,image_version,username,password).await;
+    let docker = true;
+    pull_image(&db,repositories_url_ip,image_name,image_version,username,password,docker).await;
 
     Ok(())
 }
