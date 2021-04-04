@@ -10,7 +10,7 @@ Example:
 
 2、Download Registry Image
 
-   cri_pull_image(repositories_url_ip,username,password,image_name,image_version,docker:true).await.unwrap;
+   cri_pull_image(repositories_url_ip,username,password,image_name,image_version,docker:false).await.unwrap;
 
 3、运行
 
