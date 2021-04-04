@@ -1,5 +1,16 @@
-//! use AntKingImage::cri_server_image_pull::cri_pull_image
-
+//! AntKingImage
+//!
+//! A Library For Download OCI Image
+//!
+//! Example:
+//!
+//! 1、Downloade DockerHub Image
+//!
+//! cri_pull_image("".to_string,"".to_string,"".to_string,image_name,image_version,docker:true).await.unwrap;
+//!
+//! 2、Download Registry Image
+//!
+//! cri_pull_image(repositories_url_ip,username,password,image_name,image_version,docker:true).await.unwrap;
 
 pub mod sled_json;
 pub mod record_image_repositories;
