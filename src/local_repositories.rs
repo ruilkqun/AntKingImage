@@ -50,7 +50,7 @@ pub async fn get_image_digest_local(image_name:String,image_version:String) -> S
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
-      None => return
+      None => return "".to_string()
     };
 
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
