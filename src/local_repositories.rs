@@ -51,7 +51,7 @@ pub async fn get_image_digest_local(image_name:String,image_version:String) -> R
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
-      None => return Ok("".to_string())
+      None => return Ok(&"".to_string())
     };
 
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
@@ -60,7 +60,7 @@ pub async fn get_image_digest_local(image_name:String,image_version:String) -> R
             res
         },
         _ => {
-            return Ok("".to_string())
+            return Ok(&"".to_string())
         }
     };
     let tree = TreeWrapper::<JSONEncoder<ImageVersionJSONValue>, JSONEncoder<ImageVersionJSONValue>>::new(
@@ -75,17 +75,17 @@ pub async fn get_image_digest_local(image_name:String,image_version:String) -> R
             match res  {
                 Some(res1) => {
                     match res1.decode() {
-                        None => Ok("".to_string()),
+                        None => Ok(&"".to_string()),
                         Some(res2) => {
                             let search_result = res2.image_version[image_name_version.as_str()].clone();
-                            Ok(search_result)
+                            Ok(&search_result)
                         }
                     }
                 }
-                _ => Ok("".to_string())
+                _ => Ok(&"".to_string())
             }
         },
-        _ => Ok("".to_string())
+        _ => Ok(&"".to_string())
     }
 
 }
