@@ -47,7 +47,7 @@ pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:Str
 }
 
 
-pub async fn get_image_digest_local(image_name:String,image_version:String) -> Result<String, dyn Error + 'static> {
+pub async fn get_image_digest_local(image_name:String,image_version:String) -> std::result::Result<String, dyn Error + 'static> {
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
