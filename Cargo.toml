@@ -1,6 +1,6 @@
 [package]
 name = "ant_king_image"
-version = "0.3.3"
+version = "0.3.4"
 authors = ["lurui <lurui@ipfsforce.com>"]
 edition = "2018"
 description = "A Library For Download OCI Image."
@@ -25,7 +25,6 @@ serde_json = "1.0.64"
 
 # HTTP请求
 reqwest = { version = "0.11", features = ["json"] }
-tokio = { version = "1", features = ["full"] }
 
 # 加解密
 sha256 = "1.0.0"
@@ -34,5 +33,10 @@ sha256 = "1.0.0"
 indicatif = "0.15.0"
 #indicatif = { git = "https://github.com/mitsuhiko/indicatif.git", tag = "0.15.0", version =  "0.15.0" }
 
+# 异步库
+#futures = { version = "0.1.31", default-features = false, features = ["alloc"] }
+futures = { version = "0.1.31", default-features = false }
+tokio-core = "0.1.18"
+tokio = { version = "1", features = ["full"] }
 
 

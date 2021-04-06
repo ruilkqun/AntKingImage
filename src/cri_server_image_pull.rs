@@ -3,12 +3,17 @@ use crate::utils::create_sled_db;
 use crate::get_manifest::get_manifest_info;
 use crate::get_image_digest_dockerhub::get_digest_info_dockerhub;
 
-#[tokio::main]
-pub async fn cri_pull_image(repositories_url_ip:String,username:String,password:String,image_name:String,image_version:String,docker:bool) -> String {
+use std::error::Error;
+use futures::future::Future;
+use futures::future::ok;
+
+
+// #[tokio::main]
+pub async fn cri_pull_image(repositories_url_ip:String,username:String,password:String,image_name:String,image_version:String,docker:bool) -> impl Future<Item=String,Error=Box<dyn Error + 'static>> {
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
-      None => return "".to_string()
+      None => return ok("".to_string())
     };
     pull_image(&db, repositories_url_ip.clone(), image_name.clone(), image_version.clone(), username.clone(), password.clone(), docker.clone()).await;
     return if docker {
@@ -22,7 +27,7 @@ pub async fn cri_pull_image(repositories_url_ip:String,username:String,password:
                 break;
             }
         }
-        image_digest
+        ok(image_digest)
     } else {
         let manifest_info = get_manifest_info(repositories_url_ip.clone(), username.clone(), password.clone(), image_name.clone(), image_version.clone()).await;
         let manifest_info_1 = match manifest_info {
@@ -31,12 +36,12 @@ pub async fn cri_pull_image(repositories_url_ip:String,username:String,password:
             },
             Err(e) => {
                 println!("Get manifest_ Info failed!Reason:{}", e);
-                return "".to_string()
+                return ok("".to_string())
             }
         };
 
         let image_digest = manifest_info_1.config.digest.clone();
-        image_digest
+        ok(image_digest)
     }
 }
 
