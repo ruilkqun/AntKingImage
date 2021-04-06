@@ -44,3 +44,42 @@ pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:Str
     }
 
 }
+
+
+pub async fn get_image_digest_local(db: &sled::Db,image_name:String,image_version:String) -> String{
+    let image_digest = "".to_string();
+    let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
+    let tree_tmp = match db.open_tree("image_repositories") {
+        sled::Result::Ok(res) => {
+            res
+        },
+        _ => {
+            return "".to_string()
+        }
+    };
+    let tree = TreeWrapper::<JSONEncoder<ImageVersionJSONValue>, JSONEncoder<ImageVersionJSONValue>>::new(
+        tree_tmp,
+    );
+
+    let value = tree
+    .get(image_name.clone());
+
+    match value {
+        Ok(res) => {
+            match res  {
+                Some(res1) => {
+                    match res1.decode() {
+                        None => "".to_string(),
+                        Some(res2) => {
+                            let search_result = res2.image_version[image_name_version.as_str()].clone();
+                            search_result
+                        }
+                    }
+                }
+                _ => "".to_string()
+            }
+        },
+        _ => "".to_string()
+    }
+
+}
