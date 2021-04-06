@@ -1,6 +1,7 @@
 use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::{ ImageVersionJSONValue };
 use crate::utils::create_sled_db;
+use std::error::Error;
 
 pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> bool{
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
@@ -46,11 +47,11 @@ pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:Str
 }
 
 
-pub async fn get_image_digest_local(image_name:String,image_version:String) -> String{
+pub async fn get_image_digest_local(image_name:String,image_version:String) -> Result<String, dyn Error>{
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
-      None => return "".to_string()
+      None => return Ok("".to_string())
     };
 
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
@@ -59,7 +60,7 @@ pub async fn get_image_digest_local(image_name:String,image_version:String) -> S
             res
         },
         _ => {
-            return "".to_string()
+            return Ok("".to_string())
         }
     };
     let tree = TreeWrapper::<JSONEncoder<ImageVersionJSONValue>, JSONEncoder<ImageVersionJSONValue>>::new(
@@ -74,17 +75,17 @@ pub async fn get_image_digest_local(image_name:String,image_version:String) -> S
             match res  {
                 Some(res1) => {
                     match res1.decode() {
-                        None => "".to_string(),
+                        None => Ok("".to_string()),
                         Some(res2) => {
                             let search_result = res2.image_version[image_name_version.as_str()].clone();
-                            search_result
+                            Ok(search_result)
                         }
                     }
                 }
-                _ => "".to_string()
+                _ => Ok("".to_string())
             }
         },
-        _ => "".to_string()
+        _ => Ok("".to_string())
     }
 
 }
