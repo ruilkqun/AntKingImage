@@ -9,7 +9,7 @@ use futures::future::ok;
 
 
 // #[tokio::main]
-pub async fn cri_pull_image(repositories_url_ip:String,username:String,password:String,image_name:String,image_version:String,docker:bool) -> impl Future<Item=String,Error=Box<dyn Error + 'static>> {
+pub async fn cri_pull_image(repositories_url_ip:String,username:String,password:String,image_name:String,image_version:String,docker:bool) -> impl Future<Item=String,Error=Box<dyn Error + 'static + Send + Sync>> {
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
