@@ -1,6 +1,6 @@
 use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::{ ImageVersionJSONValue };
-
+use crate::utils::create_sled_db;
 
 pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> bool{
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
@@ -46,8 +46,13 @@ pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:Str
 }
 
 
-pub async fn get_image_digest_local(db: &sled::Db,image_name:String,image_version:String) -> String{
-    let image_digest = "".to_string();
+pub async fn get_image_digest_local(image_name:String,image_version:String) -> String{
+    let db_tmp = create_sled_db().await;
+    let db = match db_tmp{
+      Some(res) => res,
+      None => return
+    };
+
     let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
     let tree_tmp = match db.open_tree("image_repositories") {
         sled::Result::Ok(res) => {
