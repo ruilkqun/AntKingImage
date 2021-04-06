@@ -6,6 +6,24 @@ use crate::public_struct::ImageLayerLayerDiffIDToLayerDigestJSONValue;
 use std::cmp::min;
 use indicatif::{ProgressBar, ProgressStyle};
 
+use sled::{Config, Mode, Db};
+
+pub async fn create_sled_db() -> Option<Db> {
+    let db = Config::new()
+        .mode(Mode::HighThroughput)
+        .path("/var/lib/AntKing/db")
+        .open();
+    return match db {
+        Ok(res) => {
+            Some(res)
+        },
+        Err(e) => {
+            println!("Failed to create database because:{}", e);
+            None
+        }
+    }
+}
+
 
 pub async fn progress_bar(total_size:i64, path:String, layer_digest:String) {
     // println!("path:{}",path.clone());

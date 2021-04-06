@@ -29,7 +29,7 @@ pub async fn get_digest_info_dockerhub(image_name:String,image_version:String) -
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
 
 
-    match client.get(url).timeout(std::time::Duration::from_secs(5)).send().await {
+    match client.get(url).timeout(std::time::Duration::from_secs(10)).send().await {
         Ok(r) => {
             match r.json().await {
                 Ok(res) => Ok(res),
