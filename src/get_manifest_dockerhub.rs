@@ -31,7 +31,7 @@ pub struct Layers {
 }
 
 
-pub async fn get_manifest_info_dockerhub(image_name:String,image_version:String) -> Result<Manifest, Box<dyn Error>> {
+pub async fn get_manifest_info_dockerhub(image_name:String,image_version:String) -> Result<Manifest, Box<dyn Error + Send>> {
     let image_digest_1 = get_digest_info_dockerhub(image_name.clone(),image_version.clone()).await.unwrap();
     let image_digest_2 = image_digest_1.images;
     let mut image_digest = "".to_string();
