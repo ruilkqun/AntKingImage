@@ -18,6 +18,7 @@ use std::collections::HashMap;
 
 
 pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:String,image_version:String,username:String,password:String,docker:bool) {
+    //  处理非Docker OCI镜像
     if !docker{
         // 获取manifest
         let manifest_info = get_manifest_info(repositories_url_ip.clone(), username.clone(), password.clone(), image_name.clone(), image_version.clone()).await;
@@ -126,6 +127,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             record_image_repositories(db,image_name.clone(),image_version.clone(),image_digest.clone()).await.unwrap();
         }
     }else {
+        //  处理Docker OCI镜像
         let manifest_info = get_manifest_info_dockerhub( image_name.clone(), image_version.clone()).await;
         let manifest_info_1 = match manifest_info {
             Ok(res) => {
