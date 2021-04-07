@@ -83,6 +83,9 @@ pub fn compute_layer_size(path:String) -> String{
     // fs::File::create(path.clone()).unwrap();
     let content = fs::read(path.clone()).unwrap();
     let size = content.len();
+
+    let cmd = format!("rm -rf {}",path);
+    Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
     return format!("{}",size)
 }
 
