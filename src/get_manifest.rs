@@ -29,7 +29,7 @@ pub struct Layers {
 }
 
 
-pub async fn get_manifest_info(repositories_url_ip:String,username:String,password:String,image_name:String,image_version:String) -> Result<Manifest, Box<dyn Error>> {
+pub async fn get_manifest_info(repositories_url_ip:String,username:String,password:String,image_name:String,image_version:String) -> Result<Manifest, Box<dyn Error + Send>> {
     let url = format!("{}/v2/{}/manifests/{}",repositories_url_ip,image_name,image_version);
     let client = reqwest::Client::new();
 
