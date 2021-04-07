@@ -3,9 +3,6 @@ use std::fs;
 use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::ImageLayerLayerDiffIDToLayerDigestJSONValue;
 
-use std::cmp::min;
-use indicatif::{ProgressBar, ProgressStyle};
-
 use sled::{Config, Mode, Db};
 
 pub async fn create_sled_db() -> Option<Db> {
@@ -25,26 +22,26 @@ pub async fn create_sled_db() -> Option<Db> {
 }
 
 
-pub async fn progress_bar(total_size:i64, path:String, layer_digest:String) {
-    // println!("path:{}",path.clone());
-    let mut downloaded = 0;
-    let total_size = total_size as u64;
-
-    let pb = ProgressBar::new(total_size);
-    pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar.cyan/blue}] {bytes}/{total_bytes} ({eta})")
-        .progress_chars("#>-"));
-
-    while downloaded < total_size {
-        downloaded = compute_layer_size(path.clone()).parse().unwrap();
-        let new = min(downloaded, total_size);
-        downloaded = new;
-        pb.set_position(new);
-    }
-
-    let message = format!("{} downloaded",layer_digest.clone());
-    pb.finish_with_message(&*message.clone());
-}
+// pub async fn progress_bar(total_size:i64, path:String, layer_digest:String) {
+//     // println!("path:{}",path.clone());
+//     let mut downloaded = 0;
+//     let total_size = total_size as u64;
+//
+//     let pb = ProgressBar::new(total_size);
+//     pb.set_style(ProgressStyle::default_bar()
+//         .template("{spinner:.green} [{elapsed_precise}] [{wide_bar.cyan/blue}] {bytes}/{total_bytes} ({eta})")
+//         .progress_chars("#>-"));
+//
+//     while downloaded < total_size {
+//         downloaded = compute_layer_size(path.clone()).parse().unwrap();
+//         let new = min(downloaded, total_size);
+//         downloaded = new;
+//         pb.set_position(new);
+//     }
+//
+//     let message = format!("{} downloaded",layer_digest.clone());
+//     pb.finish_with_message(&*message.clone());
+// }
 
 
 pub fn determine_whether_image_layer_exists(db: &sled::Db,image_digest:String,layer_diff_id:String) -> bool {

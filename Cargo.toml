@@ -30,7 +30,7 @@ reqwest = { version = "0.11", features = ["json"] }
 sha256 = "1.0.0"
 
 # 进度条
-indicatif = "0.15.0"
+#indicatif = "0.15.0"
 #indicatif = { git = "https://github.com/mitsuhiko/indicatif.git", tag = "0.15.0", version =  "0.15.0" }
 
 # 异步库
@@ -38,5 +38,8 @@ indicatif = "0.15.0"
 futures = { version = "0.1.31", default-features = false }
 tokio-core = "0.1.18"
 tokio = { version = "1", features = ["full"] }
+
+# 并行库
+rayon = "1.5.0"
 
 

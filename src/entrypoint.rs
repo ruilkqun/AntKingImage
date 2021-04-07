@@ -11,9 +11,10 @@ use crate::record_image_chainid::record_image_chain_id;
 use crate::get_manifest_dockerhub::get_manifest_info_dockerhub;
 use crate::get_config_dockerhub::{ write_config_json_dockerhub,read_config_json_dockerhub };
 
-use std::cmp::min;
-use indicatif::{ProgressBar, ProgressStyle};
 use crate::get_layers_dockerhub::get_layers_dockerhub;
+
+// use rayon::prelude::*;
+use std::collections::HashMap;
 
 
 pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:String,image_version:String,username:String,password:String,docker:bool) {
@@ -53,13 +54,23 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             let layer_2 = layer_1.split(',');
             let layer_3: Vec<&str> = layer_2.collect();
 
+            let mut rayon_vec = Vec::new();
+
             let mut layer_parent_chain_id = "".to_string();
             for i in 0..layer_3.len() {
+                // [image_digest_no_sha256,layer_digest_no_sha256,layer_diff_id,chain_id,parent_chain_id]
+                let mut layer_vec = Vec::new();
+
                 let layer_diff_id1 = format!("{}", config_info["rootfs"]["diff_ids"][i]);
                 let layer_diff_id2 = layer_diff_id1.split('"');
                 let layer_diff_id3: Vec<&str> = layer_diff_id2.collect();
                 let layer_diff_id = format!("{}", layer_diff_id3[1]);
+                // rayon_vec.push(layer_diff_id);
+
+
+
                 record_image_layer_diff_id_to_level(db, image_digest_no_sha256.clone(), layer_diff_id.clone(), i as i64).await.unwrap();
+
                 // 判断 本地layer层是否存在
                 let whether_image_layer = determine_whether_image_layer_exists(db,image_digest_no_sha256.clone(),layer_diff_id.clone());
 
@@ -68,8 +79,9 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                 let layer_digest2: Vec<&str> = layer_digest1.collect();
                 let layer_digest1_no_sha256 = format!("{}", layer_digest2[1]);
 
-                let layer_size = manifest_info_1.layers[i].size.clone();
-                // let layer_digest = get_layer_digest(repositories_url_ip.clone(), username.clone(), password.clone(), image_name.clone(), image_version.clone(),i).await;
+                layer_vec.push(image_digest_no_sha256.clone());
+                layer_vec.push(layer_digest1_no_sha256.clone());
+                layer_vec.push(layer_diff_id.clone());
 
                 if whether_image_layer{
                     continue
@@ -77,75 +89,38 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                     record_image_digest_layer_diff_id_to_layer_digest(db,image_digest_no_sha256.clone(),layer_diff_id.clone(),layer_digest.clone()).await.unwrap();
                     record_image_digest_layer_digest_layer_diff_id(db,image_digest_no_sha256.clone(),layer_diff_id.clone(),layer_digest.clone()).await.unwrap();
 
-
-                    let layer_digest_progress = layer_digest1_no_sha256.clone();
-                    let path_progress = format!("du -shb /var/lib/AntKing/images/{}/* | grep {} || du -shb /var/lib/AntKing/gz/{}/* | grep {}",image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone(),image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone());
-
-                    // let path_progress = format!("/var/lib/AntKing/gz/{}/{}.tar.gz",image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone());
-
-                    let handle = std::thread::spawn(move || {
-                        // println!("hi");
-                        // std::fs::File::create(path_progress.clone()).unwrap();
-                        let mut downloaded = 0;
-                        let total_size = layer_size as u64;
-
-                        let pb = ProgressBar::new(total_size);
-                        pb.set_style(ProgressStyle::default_bar()
-                            .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
-                            .progress_chars("=>-"));
-
-                        // let mut i =0;
-                        while downloaded < total_size {
-                            // let cmd = format!("du -shb {}",path_progress.clone());
-                            // println!("cmd:{}",cmd);
-                            let cmd = format!("{}",path_progress.clone());
-                            let result = String::from_utf8(std::process::Command::new("sh").arg("-c").arg(cmd).output().unwrap().stdout).unwrap();
-                            if result != "".to_string() {
-                                let result1 = result.split('/');
-                                let result2:Vec<&str> = result1.collect();
-                                let result3 = result2[0];
-                                let result4 = format!("{}",result3.trim());
-                                // println!("result:{}123",result4.clone());
-                                // downloaded = compute_layer_size(path_progress.clone()).parse().unwrap();
-                                // println!("downloaded:{}",downloaded);
-
-                                downloaded = result4.parse::<u64>().unwrap();
-                                // downloaded += i;
-                                // i += 100;
-                            }else {
-                                downloaded = 0;
-                            }
-
-                            // downloaded = match result7.parse() {
-                            //     Ok(res) => res,
-                            //     Err(_) => 0
-                            // };
-                            // downloaded = 1;
-                            let new = min(downloaded, total_size);
-                            downloaded = new;
-                            pb.set_position(new);
-                        }
-
-                        let message = format!("{} downloaded",layer_digest_progress.clone());
-                        pb.finish_with_message(&*message.clone());
-                                // 进度条
-                                // progress_bar(layer_size.clone(), path_progress.clone(), layer_digest_progress).await;
-                    });
-
-
-                    // 获取镜像层
-                    get_layers(repositories_url_ip.clone(),username.clone(), password.clone(),image_name.clone(),image_digest.clone(),layer_digest.clone(),layer_diff_id.clone()).await;
-
-                    handle.join().unwrap();
-                    // 记录chain_id
                     let chain_id = computer_layer_chain_id(layer_parent_chain_id.clone(),layer_diff_id.clone());
-                    let path = format!("/var/lib/AntKing/images/{}/{}.tar",image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone());
-                    // println!("path:{}",path);
-                    let size = compute_layer_size(path.clone());
-                    record_image_chain_id(db,image_digest_no_sha256.clone(),chain_id.clone(),layer_diff_id.clone(),layer_diff_id.clone(),layer_parent_chain_id.clone(),size).await.unwrap();
+                    layer_vec.push(chain_id.clone());
+                    layer_vec.push(layer_parent_chain_id.clone());
                     layer_parent_chain_id = chain_id.clone();
                 }
+
+                layer_vec.push(image_digest.clone());
+                layer_vec.push(layer_digest.clone());
+                let mut layer_hashmap = HashMap::new();
+                layer_hashmap.insert("item",layer_vec);
+                rayon_vec.push(layer_hashmap);
             }
+
+            for item in rayon_vec {
+                        // 获取镜像层
+                        get_layers(
+                            repositories_url_ip.clone(),
+                            username.clone(),
+                            password.clone(),
+                            image_name.clone(),
+                            item["item"][5].clone(),
+                            item["item"][6].clone(),
+                            item["item"][2].clone()
+                        ).await;
+                        // 计算层size
+                        let path = format!("/var/lib/AntKing/images/{}/{}.tar",item["item"][0.clone()],item["item"][1].clone());
+                        let size = compute_layer_size(path.clone());
+                        // 记录chain_id
+                        record_image_chain_id(db,item["item"][0].clone(),item["item"][3].clone(),item["item"][2].clone(),item["item"][2].clone(),item["item"][4].clone(),size).await.unwrap();
+            }
+
+
             let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
             println!("Download Image {} complete!",image_name_version);
             record_image_repositories(db,image_name.clone(),image_version.clone(),image_digest.clone()).await.unwrap();
@@ -185,8 +160,14 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             let layer_2 = layer_1.split(',');
             let layer_3: Vec<&str> = layer_2.collect();
 
+            let mut rayon_vec = Vec::new();
+
             let mut layer_parent_chain_id = "".to_string();
             for i in 0..layer_3.len() {
+                // [image_digest_no_sha256,layer_digest_no_sha256,layer_diff_id,chain_id,parent_chain_id]
+                let mut layer_vec = Vec::new();
+
+
                 let layer_diff_id1 = format!("{}", config_info["rootfs"]["diff_ids"][i]);
                 let layer_diff_id2 = layer_diff_id1.split('"');
                 let layer_diff_id3: Vec<&str> = layer_diff_id2.collect();
@@ -200,8 +181,10 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                 let layer_digest2: Vec<&str> = layer_digest1.collect();
                 let layer_digest1_no_sha256 = format!("{}", layer_digest2[1]);
 
-                let layer_size = manifest_info_1.layers[i].size.clone();
-                // let layer_digest = get_layer_digest(repositories_url_ip.clone(), username.clone(), password.clone(), image_name.clone(), image_version.clone(),i).await;
+
+                layer_vec.push(image_digest_no_sha256.clone());
+                layer_vec.push(layer_digest1_no_sha256.clone());
+                layer_vec.push(layer_diff_id.clone());
 
                 if whether_image_layer{
                     continue
@@ -210,64 +193,35 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                     record_image_digest_layer_digest_layer_diff_id(db,image_digest_no_sha256.clone(),layer_diff_id.clone(),layer_digest.clone()).await.unwrap();
 
 
-                    let layer_digest_progress = layer_digest1_no_sha256.clone();
-                    let path_progress = format!("du -shb /var/lib/AntKing/images/{}/* | grep {} || du -shb /var/lib/AntKing/gz/{}/* | grep {}",image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone(),image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone());
-
-                    // let path_progress = format!("/var/lib/AntKing/gz/{}/{}.tar.gz",image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone());
-
-                    let handle = std::thread::spawn(move || {
-                        // println!("hi");
-                        // std::fs::File::create(path_progress.clone()).unwrap();
-                        let mut downloaded = 0;
-                        let total_size = layer_size as u64;
-
-                        let pb = ProgressBar::new(total_size);
-                        pb.set_style(ProgressStyle::default_bar()
-                            .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
-                            .progress_chars("=>-"));
-
-                        // let mut i =0;
-                        while downloaded < total_size {
-                            // let cmd = format!("du -shb {}",path_progress.clone());
-                            // println!("cmd:{}",cmd);
-                            let cmd = format!("{}",path_progress.clone());
-                            let result = String::from_utf8(std::process::Command::new("sh").arg("-c").arg(cmd).output().unwrap().stdout).unwrap();
-                            if result != "".to_string() {
-                                let result1 = result.split('/');
-                                let result2:Vec<&str> = result1.collect();
-                                let result3 = result2[0];
-                                let result4 = format!("{}",result3.trim());
-
-                                downloaded = result4.parse::<u64>().unwrap();
-                            }else {
-                                downloaded = 0;
-                            }
-
-                            let new = min(downloaded, total_size);
-                            downloaded = new;
-                            pb.set_position(new);
-                        }
-
-                        let message = format!("{} downloaded",layer_digest_progress.clone());
-                        pb.finish_with_message(&*message.clone());
-                                // 进度条
-                                // progress_bar(layer_size.clone(), path_progress.clone(), layer_digest_progress).await;
-                    });
-
-
-                    // 获取镜像层
-                    get_layers_dockerhub(image_name.clone(),image_digest.clone(),layer_digest.clone(),layer_diff_id.clone()).await;
-
-                    handle.join().unwrap();
-                    // 记录chain_id
                     let chain_id = computer_layer_chain_id(layer_parent_chain_id.clone(),layer_diff_id.clone());
-                    let path = format!("/var/lib/AntKing/images/{}/{}.tar",image_digest_no_sha256.clone(),layer_digest1_no_sha256.clone());
-                    // println!("path:{}",path);
-                    let size = compute_layer_size(path.clone());
-                    record_image_chain_id(db,image_digest_no_sha256.clone(),chain_id.clone(),layer_diff_id.clone(),layer_diff_id.clone(),layer_parent_chain_id.clone(),size).await.unwrap();
+                    layer_vec.push(chain_id.clone());
+                    layer_vec.push(layer_parent_chain_id.clone());
                     layer_parent_chain_id = chain_id.clone();
                 }
+
+                layer_vec.push(image_digest.clone());
+                layer_vec.push(layer_digest.clone());
+                let mut layer_hashmap = HashMap::new();
+                layer_hashmap.insert("item",layer_vec);
+                rayon_vec.push(layer_hashmap);
             }
+
+
+            for item in rayon_vec {
+                // 获取镜像层
+                get_layers_dockerhub(
+                    image_name.clone(),
+                    item["item"][5].clone(),
+                    item["item"][6].clone(),
+                    item["item"][2].clone()
+                ).await;
+                // 计算层size
+                let path = format!("/var/lib/AntKing/images/{}/{}.tar",item["item"][0.clone()],item["item"][1].clone());
+                let size = compute_layer_size(path.clone());
+                // 记录chain_id
+                record_image_chain_id(db,item["item"][0].clone(),item["item"][3].clone(),item["item"][2].clone(),item["item"][2].clone(),item["item"][4].clone(),size).await.unwrap();
+            }
+
             let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
             println!("Download Image {} complete!",image_name_version);
             record_image_repositories(db,image_name.clone(),image_version.clone(),image_digest.clone()).await.unwrap();
