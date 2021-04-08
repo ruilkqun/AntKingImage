@@ -10,6 +10,7 @@ use crate::record_image_chainid::record_image_chain_id;
 use crate::get_manifest_dockerhub::{get_manifest_info_dockerhub,Manifest as DockerManifest};
 use crate::get_config_dockerhub::{ write_config_json_dockerhub,read_config_json_dockerhub };
 use crate::get_layers_dockerhub::get_layers_dockerhub;
+use crate::get_token_dockerhub::get_token_dockerhub;
 // use rayon::prelude::*;
 use std::collections::HashMap;
 
@@ -136,6 +137,18 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
         }
 
 
+        let  token;
+        match !docker {
+            true => {
+                token = "".to_string();
+            },
+            false => {
+                // 获取dockerhub token
+                let token_1 = get_token_dockerhub(image_name.clone()).await.unwrap();
+                token = format!("{}",token_1.access_token);
+            }
+        }
+
         for item in rayon_vec {
             match !docker {
                 true => {
@@ -156,7 +169,8 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                         image_name.clone(),
                         item["item"][5].clone(),
                         item["item"][6].clone(),
-                        item["item"][2].clone()
+                        item["item"][2].clone(),
+                        token
                     ).await;
                 }
             };

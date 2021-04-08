@@ -68,10 +68,6 @@ pub async fn get_layers(repositories_url_ip:String,username:String,password:Stri
                                 if image_layer_sha256 == layer_digest {
                                     // println!("Download image layer successfully！");
 
-                                    // let cmd = format!("cp {} {}",path.clone(),image_gz_storage_path.clone());
-                                    // // println!("cmd:{}",cmd);
-                                    // Command::new("sh").arg("-c").arg(cmd).output().unwrap().stdout;
-
                                     let output1 = Command::new("gzip").arg("-d").arg(path.clone()).output();
                                     match output1 {
                                         Ok(res) => {

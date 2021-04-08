@@ -4,7 +4,6 @@ use std::fs;
 use std::io::prelude::*;
 use sha256::digest_bytes;
 use std::process::Command;
-use crate::get_token_dockerhub::get_token_dockerhub;
 
 // use crate::get_manifest::get_manifest_info;
 
@@ -20,7 +19,7 @@ use crate::get_token_dockerhub::get_token_dockerhub;
 // }
 
 
-pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_digest:String,layer_diff_id:String)  {
+pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_digest:String,layer_diff_id:String,token:String)  {
     let url = format!("https://registry.hub.docker.com/v2/{}/blobs/{}", image_name, layer_digest);
     // println!("get_layers_url:{}",url);
     let client = reqwest::Client::new();
@@ -29,8 +28,6 @@ pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_d
 
     headers.insert("Content-Type", "application/vnd.docker.image.rootfs.diff.tar.gzip".parse().unwrap());
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
-    let token_1 = get_token_dockerhub(image_name.clone()).await.unwrap();
-    let token = format!("{}",token_1.access_token);
 
     let image_storage_path_1 = image_digest.split(':');
     let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();
@@ -69,9 +66,6 @@ pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_d
                             if r2 > 0 {
                                 let image_layer_sha256 = format!("sha256:{}",digest_bytes(&*fs::read(path.clone()).unwrap()));
                                 if image_layer_sha256 == layer_digest {
-                                    // let cmd = format!("cp {} {}",path.clone(),image_gz_storage_path.clone());
-                                    // Command::new("sh").arg("-c").arg(cmd).output().unwrap().stdout;
-
                                     let output1 = Command::new("gzip").arg("-d").arg(path.clone()).output();
                                     match output1 {
                                         Ok(res) => {
