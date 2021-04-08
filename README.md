@@ -29,10 +29,10 @@ use ant_king_image::cri_server_image_pull::cri_pull_image;
 use ant_king_image::local_repositories::get_image_digest_local;
 
 
-pub async fn pull_image_impl_v1(request:Request<PullImageRequest>) -> PullImageResponse {
+pub async fn pull_image_impl_v1alpha2(request:Request<PullImageRequest>) -> PullImageResponse {
         // docker:nginx:latest
         // docker:ruilkyu/nginx:latest
-        // 192.168.1.118:8899/saodiseng/nginx:latest
+        // harbor:192.168.1.118:8899/saodiseng/nginx:latest
         let pull_image_request = request.into_inner();
         let image_tmp1 = pull_image_request.clone().image;
         let auth = pull_image_request.clone().auth;
@@ -85,21 +85,26 @@ pub async fn pull_image_impl_v1(request:Request<PullImageRequest>) -> PullImageR
                                 return reply
                         }
                 };
-                let username = image_auth.username;
-                let password = image_auth.password;
-                let image_version = image_analysis2[2];
-                let tmp1 = image_analysis2[1].split("/");
-                let tmp2:Vec<&str> = tmp1.collect();
-                let tmp3 = format!("{}:{}",image_analysis2[0],tmp2[0]);
-                let mut tmp4 = "".to_string();
-                for l in 1..tmp2.len() {
-                        tmp4 += &*("/".to_string() + tmp2[l]);
-                }
-                let image_name = format!("{}",tmp4);
+                let username = format!("{}",image_auth.username);
+                let password = format!("{}",image_auth.password);
 
-                cri_pull_image(tmp3, username, password, image_name.parse().unwrap(), image_version.parse().unwrap(), true).await;
+                let port_tmp0 = format!("{}",image_analysis2[image_analysis2.len()-2]);
+                let port_tmp1 = port_tmp0.split("/");
+                let port_tmp2:Vec<&str> = port_tmp1.collect();
+
+                let port = port_tmp2[0];
+                let repositories_url_ip = format!("{}:{}",image_analysis2[1],port);
+
+                let mut image_name_tmp:String = format!("{}",port_tmp2[1]);
+                for k in 2..port_tmp2.len(){
+                        image_name_tmp += &*("/".to_owned() + port_tmp2[k])
+                }
+                let image_name = format!("{}",image_name_tmp);
+                let image_version = format!("{}",image_analysis2[image_analysis2.len()-1]);
+
+                cri_pull_image(repositories_url_ip.clone(), username.clone(), password.clone(), image_name.clone(), image_version.clone(), false).await;
                 let image_digest_1 = get_image_digest_local(image_name.clone().parse().unwrap(), image_version.clone().parse().unwrap()).await.unwrap();
-                let image_digest = format!("{}@{}",image_name.clone(),image_digest_1.clone());
+                let image_digest = format!("{}{}@{}",repositories_url_ip.clone(),image_name.clone(),image_digest_1.clone());
                 println!("image_digest:{}",image_digest.clone());
 
                 let reply = PullImageResponse {
@@ -120,6 +125,11 @@ Image is up to date for ruilkyu/nginx@sha256:bd877619f4ab21d0d2a26c622c0c51935d4
 
 [root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  pull docker:nginx:latest
 Image is up to date for library/nginx@sha256:7ce4f91ef623b9672ec12302c4a710629cd542617c1ebc616a48d06e2a84656a
+
+
+
+[root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock pull --creds=admin:saodiseng harbor:192.168.1.118:8899/saodiseng/nginx:latest
+Image is up to date for 192.168.1.118:8899saodiseng/nginx@sha256:6084105296a952523c36eea261af38885f41e9d1d0001b4916fa426e45377ffe
 ```
 
 
