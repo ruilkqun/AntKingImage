@@ -17,6 +17,19 @@ use std::collections::HashMap;
 
 pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:String,image_version:String,username:String,password:String,docker:bool) {
     // 获取manifest(非Docker OCI镜像和Docker OCI镜像)
+
+    // 获取dockerhub token
+    let  token;
+    match !docker {
+        true => {
+            token = "".to_string();
+        },
+        false => {
+            let token_1 = get_token_dockerhub(image_name.clone()).await.unwrap();
+            token = format!("{}",token_1.access_token);
+        }
+    }
+
     let mut manifest_info1:NDockerManifest = NDockerManifest::default();
     let mut manifest_info_docker1:DockerManifest = DockerManifest::default();
     match !docker{
@@ -33,7 +46,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             }
         },
         false => {
-            let manifest_info_docker = get_manifest_info_dockerhub( image_name.clone(), image_version.clone()).await;
+            let manifest_info_docker = get_manifest_info_dockerhub( image_name.clone(), image_version.clone(),token.clone()).await;
             manifest_info_docker1 = match manifest_info_docker {
                 Ok(res) => {
                     res
@@ -73,7 +86,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             },
             false => {
                 // 获取镜像配置文件
-                write_config_json_dockerhub( image_name.clone(), image_digest.clone()).await;
+                write_config_json_dockerhub( image_name.clone(), image_digest.clone(),token.clone()).await;
             }
         };
 
@@ -136,17 +149,6 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             rayon_vec.push(layer_hashmap);
         }
 
-        // 获取dockerhub token
-        let  token;
-        match !docker {
-            true => {
-                token = "".to_string();
-            },
-            false => {
-                let token_1 = get_token_dockerhub(image_name.clone()).await.unwrap();
-                token = format!("{}",token_1.access_token);
-            }
-        }
 
         for item in rayon_vec {
             match !docker {

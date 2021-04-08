@@ -4,11 +4,10 @@ use std::fs;
 use std::io::prelude::*;
 use serde_json::Value;
 use sha256::digest;
-use crate::get_token_dockerhub::get_token_dockerhub;
 
 
 // 写入当前镜像的配置json文件
-pub async fn write_config_json_dockerhub(image_name:String,image_digest:String)  {
+pub async fn write_config_json_dockerhub(image_name:String,image_digest:String,token:String)  {
     let url = format!("https://registry.hub.docker.com/v2/{}/blobs/{}",image_name.clone(),image_digest.clone());
     let client = reqwest::Client::new();
 
@@ -16,8 +15,6 @@ pub async fn write_config_json_dockerhub(image_name:String,image_digest:String) 
 
     headers.insert("Content-Type", "application/vnd.docker.container.image.v1+json".parse().unwrap());
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
-    let token_1 = get_token_dockerhub(image_name.clone()).await.unwrap();
-    let token = format!("{}",token_1.access_token);
 
     let image_storage_path_1 = image_digest.split(':');
     let image_storage_path_2: Vec<&str> = image_storage_path_1.collect();

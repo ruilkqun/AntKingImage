@@ -1,7 +1,6 @@
 use serde::{Serialize, Deserialize};
 use std::error::Error;
 use reqwest::header::HeaderMap;
-use crate::get_token_dockerhub::get_token_dockerhub;
 use crate::get_image_digest_dockerhub::get_digest_info_dockerhub;
 
 
@@ -31,7 +30,7 @@ pub struct Layers {
 }
 
 
-pub async fn get_manifest_info_dockerhub(image_name:String,image_version:String) -> Result<Manifest, Box<dyn Error + Send>> {
+pub async fn get_manifest_info_dockerhub(image_name:String,image_version:String,token:String) -> Result<Manifest, Box<dyn Error + Send>> {
     let image_digest_1 = get_digest_info_dockerhub(image_name.clone(),image_version.clone()).await.unwrap();
     let image_digest_2 = image_digest_1.images;
     let mut image_digest = "".to_string();
@@ -50,8 +49,6 @@ pub async fn get_manifest_info_dockerhub(image_name:String,image_version:String)
     let mut headers = HeaderMap::new();
     headers.insert("Content-Type", "application/vnd.docker.distribution.manifest.v2+json".parse().unwrap());
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
-    let token_1 = get_token_dockerhub(image_name.clone()).await.unwrap();
-    let token = format!("{}",token_1.access_token);
 
 
     match client.get(url.clone()).bearer_auth(token.clone()).timeout(std::time::Duration::from_secs(10)).send().await {
