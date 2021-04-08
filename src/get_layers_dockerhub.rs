@@ -53,7 +53,11 @@ pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_d
     let path2 = format!("{}/{}",image_storage_path.clone(),layer_storage_path_4.clone());
 
     fs::create_dir_all(path2.clone()).unwrap();
-
+    let remove_gz = fs::remove_file(path.clone());
+    match remove_gz {
+        Ok(_) => {},
+        Err(_) => {}
+    }
     let mut file = File::create(path.clone()).unwrap();
 
     match client.get(url).bearer_auth(token.clone()).headers(headers).send().await {
@@ -74,6 +78,13 @@ pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_d
                                                     let image_layer_tar_sha256 = format!("sha256:{}",digest_bytes(&*fs::read(path1.clone()).unwrap()));
                                                     // TODO 获取diffID与image_layer_tar_sha256比较
                                                     if image_layer_tar_sha256 == layer_diff_id.clone() {
+                                                        let remove_dir_path = format!("{}/{}",path2.clone(),layer_diff_id.clone());
+                                                        let remove_layer_dir = fs::remove_dir_all(remove_dir_path);
+                                                        match remove_layer_dir {
+                                                            Ok(_) => {},
+                                                            Err(_) => {}
+                                                        }
+
                                                         let cmd = format!("tar -xvf {} -C {}",path1,path2);
                                                         let output2 = Command::new("sh").arg("-c").arg(cmd.clone()).output();
                                                         match output2 {
