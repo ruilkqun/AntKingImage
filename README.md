@@ -28,8 +28,10 @@ Download Image ruilkyu/nginx:latest complete!
 use ant_king_image::cri_server_image_pull::cri_pull_image;
 use ant_king_image::local_repositories::get_image_digest_local;
 
-pub async fn pull_image_impl_v1alpha2(request:Request<PullImageRequest>) -> PullImageResponse {
+
+pub async fn pull_image_impl_v1(request:Request<PullImageRequest>) -> PullImageResponse {
         // docker:nginx:latest
+        // docker:ruilkyu/nginx:latest
         // 192.168.1.118:8899/saodiseng/nginx:latest
         let pull_image_request = request.into_inner();
         let image_tmp1 = pull_image_request.clone().image;
@@ -54,10 +56,21 @@ pub async fn pull_image_impl_v1alpha2(request:Request<PullImageRequest>) -> Pull
                 let image_name = image_analysis2[1];
                 let image_version = image_analysis2[2];
 
-                cri_pull_image("".to_string(), "".to_string(), "".to_string(), image_name.clone().parse().unwrap(), image_version.clone().parse().unwrap(), true).await;
-                let image_digest_1 = get_image_digest_local(image_name.clone().parse().unwrap(), image_version.clone().parse().unwrap()).await.unwrap();
-                let image_digest = format!("{}@{}",image_name.clone(),image_digest_1.clone());
+                let tmp1 =  image_name.clone().split("/");
+                let tmp2:Vec<&str> = tmp1.collect();
+
+                let image_completed_name:String;
+                if tmp2.len() > 1 {
+                        image_completed_name = image_name.clone().parse().unwrap();
+                }else {
+                        image_completed_name = format!("library/{}", image_name.clone());
+                }
+
+                cri_pull_image("".to_string(), "".to_string(), "".to_string(), image_completed_name.clone().parse().unwrap(), image_version.clone().parse().unwrap(), true).await;
+                let image_digest_1 = get_image_digest_local(image_completed_name.clone().parse().unwrap(), image_version.clone().parse().unwrap()).await.unwrap();
+                let image_digest = format!("{}@{}",image_completed_name.clone(),image_digest_1.clone());
                 println!("image_digest:{}",image_digest.clone());
+
                 let reply = PullImageResponse {
                         image_ref: image_digest.clone()
                 };
@@ -102,6 +115,11 @@ pub async fn pull_image_impl_v1alpha2(request:Request<PullImageRequest>) -> Pull
 [root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  pull docker:ruilkyu/nginx:latest
 
 Image is up to date for ruilkyu/nginx@sha256:bd877619f4ab21d0d2a26c622c0c51935d4da763203d83f542e39a4720d09bdc
+
+
+
+[root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  pull docker:nginx:latest
+Image is up to date for library/nginx@sha256:7ce4f91ef623b9672ec12302c4a710629cd542617c1ebc616a48d06e2a84656a
 ```
 
 
