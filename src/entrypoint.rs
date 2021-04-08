@@ -136,14 +136,13 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             rayon_vec.push(layer_hashmap);
         }
 
-
+        // 获取dockerhub token
         let  token;
         match !docker {
             true => {
                 token = "".to_string();
             },
             false => {
-                // 获取dockerhub token
                 let token_1 = get_token_dockerhub(image_name.clone()).await.unwrap();
                 token = format!("{}",token_1.access_token);
             }
@@ -170,7 +169,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                         item["item"][5].clone(),
                         item["item"][6].clone(),
                         item["item"][2].clone(),
-                        token
+                        token.clone()
                     ).await;
                 }
             };
