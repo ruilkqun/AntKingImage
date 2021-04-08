@@ -11,7 +11,7 @@ use sha256::digest;
 
 // 写入当前镜像的配置json文件
 pub async fn write_config_json(repositories_url_ip:String,username:String,password:String,image_name:String,image_digest:String)  {
-    let url = format!("{}/v2/{}/blobs/{}",repositories_url_ip.clone(),image_name.clone(),image_digest.clone());
+    let url = format!("http://{}/v2/{}/blobs/{}",repositories_url_ip.clone(),image_name.clone(),image_digest.clone());
     let client = reqwest::Client::new();
 
     let mut headers = HeaderMap::new();

@@ -20,7 +20,7 @@ use std::process::Command;
 
 
 pub async fn get_layers(repositories_url_ip:String,username:String,password:String,image_name:String,image_digest:String, layer_digest:String,layer_diff_id:String)  {
-    let url = format!("{}/v2/{}/blobs/{}", repositories_url_ip, image_name, layer_digest);
+    let url = format!("http://{}/v2/{}/blobs/{}", repositories_url_ip, image_name, layer_digest);
     // println!("get_layers_url:{}",url);
     let client = reqwest::Client::new();
 

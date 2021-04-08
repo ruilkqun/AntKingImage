@@ -30,8 +30,7 @@ pub struct Layers {
 
 
 pub async fn get_manifest_info(repositories_url_ip:String,username:String,password:String,image_name:String,image_version:String) -> Result<Manifest, Box<dyn Error + Send>> {
-    let url = format!("{}/v2/{}/manifests/{}",repositories_url_ip,image_name,image_version);
-    println!("url:{}",url.clone());
+    let url = format!("http://{}/v2/{}/manifests/{}",repositories_url_ip,image_name,image_version);
     let client = reqwest::Client::new();
 
     let mut headers = HeaderMap::new();
@@ -40,16 +39,18 @@ pub async fn get_manifest_info(repositories_url_ip:String,username:String,passwo
     headers.insert("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6".parse().unwrap());
 
 
-    match client.get(url.clone()).basic_auth(username,Some(password)).headers(headers).timeout(std::time::Duration::from_secs(5)).send().await {
+    match client.get(url.clone()).basic_auth(username.clone(),Some(password.clone())).headers(headers).timeout(std::time::Duration::from_secs(10)).send().await {
         Ok(r) => {
             match r.json().await {
                 Ok(res) => Ok(res),
                 Err(e) => {
+                    println!("1");
                     Err(Box::new(e))
                 }
             }
         },
         Err(e) => {
+            println!("2");
             Err(Box::new(e))
         }
     }
