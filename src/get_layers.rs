@@ -53,6 +53,7 @@ pub async fn get_layers(repositories_url_ip:String,username:String,password:Stri
     let path2 = format!("{}/{}",image_storage_path.clone(),layer_storage_path_4.clone());
 
     fs::create_dir_all(path2.clone()).unwrap();
+    fs::remove_file(path.clone());
 
     let mut file = File::create(path.clone()).unwrap();
 
@@ -78,6 +79,8 @@ pub async fn get_layers(repositories_url_ip:String,username:String,password:Stri
                                                     // TODO 获取diffID与image_layer_tar_sha256比较
                                                     if image_layer_tar_sha256 == layer_diff_id.clone() {
                                                         // println!("Image integrity");
+                                                        let remove_dir = format!("{}/{}",path2.clone(),layer_diff_id.clone());
+                                                        fs::remove_dir_all(remove_dir);
                                                         let cmd = format!("tar -xvf {} -C {}",path1,path2);
                                                         let output2 = Command::new("sh").arg("-c").arg(cmd.clone()).output();
                                                         match output2 {

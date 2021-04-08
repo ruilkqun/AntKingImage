@@ -133,9 +133,6 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             if whether_image_layer{
                 continue
             }else {
-                record_image_digest_layer_diff_id_to_layer_digest(db,image_digest_no_sha256.clone(),layer_diff_id.clone(),layer_digest.clone()).await.unwrap();
-                record_image_digest_layer_digest_layer_diff_id(db,image_digest_no_sha256.clone(),layer_diff_id.clone(),layer_digest.clone()).await.unwrap();
-
                 let chain_id = computer_layer_chain_id(layer_parent_chain_id.clone(),layer_diff_id.clone());
                 layer_vec.push(chain_id.clone());
                 layer_vec.push(layer_parent_chain_id.clone());
@@ -163,6 +160,9 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                         item["item"][6].clone(),
                         item["item"][2].clone()
                     ).await;
+                    // 数据库 记录层
+                    record_image_digest_layer_diff_id_to_layer_digest(db,item["item"][5].clone(),item["item"][2].clone(),item["item"][6].clone()).await.unwrap();
+                    record_image_digest_layer_digest_layer_diff_id(db,item["item"][5].clone(),item["item"][2].clone(),item["item"][6].clone()).await.unwrap();
                 },
                 false => {
                     // 获取镜像层
@@ -173,6 +173,9 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                         item["item"][2].clone(),
                         token.clone()
                     ).await;
+                    // 数据库 记录层
+                    record_image_digest_layer_diff_id_to_layer_digest(db,item["item"][5].clone(),item["item"][2].clone(),item["item"][6].clone()).await.unwrap();
+                    record_image_digest_layer_digest_layer_diff_id(db,item["item"][5].clone(),item["item"][2].clone(),item["item"][6].clone()).await.unwrap();
                 }
             };
             // 计算层size
