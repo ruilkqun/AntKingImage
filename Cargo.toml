@@ -1,6 +1,6 @@
 [package]
 name = "ant_king_image"
-version = "0.3.18"
+version = "0.3.19"
 authors = ["lurui <lurui@ipfsforce.com>"]
 edition = "2018"
 description = "A Library For Download OCI Image."
