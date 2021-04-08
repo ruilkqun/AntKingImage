@@ -81,6 +81,10 @@ pub fn compute_layer_size(path:String) -> String{
     let content = fs::read(path.clone()).unwrap();
     let size = content.len();
 
+    let path1 = format!("{}.gz",path.clone());
+    let cmd = format!("tar -zcvf {} {}",path1.clone(),path.clone());
+    Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
+
     let cmd = format!("rm -rf {}",path);
     Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
     return format!("{}",size)

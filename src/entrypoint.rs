@@ -18,7 +18,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
     // 获取manifest(非Docker OCI镜像和Docker OCI镜像)
     let mut manifest_info1:NDockerManifest = NDockerManifest::default();
     let mut manifest_info_docker1:DockerManifest = DockerManifest::default();
-    match docker{
+    match !docker{
         true => {
             let manifest_info = get_manifest_info(repositories_url_ip.clone(), username.clone(), password.clone(), image_name.clone(), image_version.clone()).await;
             manifest_info1 = match manifest_info {
@@ -48,7 +48,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
 
     // 获取不带sha256前缀的镜像摘要
     let image_digest;
-    match docker {
+    match !docker {
         true => image_digest = manifest_info1.config.digest.clone(),
         false => image_digest = manifest_info_docker1.config.digest.clone()
     }
@@ -65,7 +65,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
         println!("Image already exists!");
         return
     } else {
-        match docker {
+        match !docker {
             true => {
                 // 获取镜像配置文件
                 write_config_json(repositories_url_ip.clone(), username.clone(), password.clone(), image_name.clone(), image_digest.clone()).await;
@@ -76,7 +76,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             }
         };
 
-        let config_info = match docker {
+        let config_info = match !docker {
             true =>   read_config_json(image_digest_no_sha256.clone()).await,
             false =>  read_config_json_dockerhub(image_digest_no_sha256.clone()).await
         };
@@ -101,7 +101,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
 
             // 获取当前层层摘要
             let layer_digest;
-            match docker {
+            match !docker {
                 true => layer_digest = manifest_info1.layers[i].digest.clone(),
                 false => layer_digest = manifest_info_docker1.layers[i].digest.clone()
             }
@@ -137,7 +137,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
 
 
         for item in rayon_vec {
-            match docker {
+            match !docker {
                 true => {
                     // 获取镜像层
                     get_layers(
@@ -161,7 +161,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
                 }
             };
             // 计算层size
-            let path = format!("/var/lib/AntKing/images/{}/{}.tar", item["item"][0.clone()], item["item"][1].clone());
+            let path = format!("/var/lib/AntKing/gz/{}/{}.tar", item["item"][0.clone()], item["item"][1].clone());
             let size = compute_layer_size(path.clone());
             // 记录chain_id
             record_image_chain_id(db, item["item"][0].clone(), item["item"][3].clone(), item["item"][2].clone(), item["item"][2].clone(), item["item"][4].clone(), size).await.unwrap();

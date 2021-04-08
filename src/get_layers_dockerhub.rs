@@ -45,8 +45,8 @@ pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_d
     let layer_name_tmp = layer_digest.split(':');
     let layer_name: Vec<&str> = layer_name_tmp.collect();
 
-    let path = format!("{}/{}.tar.gz",image_storage_path.clone(),layer_name[1].clone());
-    let path1 = format!("{}/{}.tar",image_storage_path.clone(),layer_name[1].clone());
+    let path = format!("{}/{}.tar.gz",image_gz_storage_path.clone(),layer_name[1].clone());
+    let path1 = format!("{}/{}.tar",image_gz_storage_path.clone(),layer_name[1].clone());
 
 
     let layer_storage_path_1 = layer_diff_id.split(':');
@@ -69,8 +69,8 @@ pub async fn get_layers_dockerhub(image_name:String,image_digest:String, layer_d
                             if r2 > 0 {
                                 let image_layer_sha256 = format!("sha256:{}",digest_bytes(&*fs::read(path.clone()).unwrap()));
                                 if image_layer_sha256 == layer_digest {
-                                    let cmd = format!("cp {} {}",path.clone(),image_gz_storage_path.clone());
-                                    Command::new("sh").arg("-c").arg(cmd).output().unwrap().stdout;
+                                    // let cmd = format!("cp {} {}",path.clone(),image_gz_storage_path.clone());
+                                    // Command::new("sh").arg("-c").arg(cmd).output().unwrap().stdout;
 
                                     let output1 = Command::new("gzip").arg("-d").arg(path.clone()).output();
                                     match output1 {
