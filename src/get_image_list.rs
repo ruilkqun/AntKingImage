@@ -7,13 +7,17 @@ use crate::utils::create_sled_db;
 
 
 pub async fn read_image_list_repositories(image_name:String,image_version:String,image_digest:String) -> Vec<ImageListItemJSONValue> {
+    let mut result_vec:Vec<ImageListItemJSONValue> = Vec::new();
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
-      None => return
+      None => {
+                let result_item = ImageListItemJSONValue::default();
+                result_vec.push(result_item);
+                return result_vec
+      }
     };
 
-    let mut result_vec:Vec<ImageListItemJSONValue> = Vec::new();
     if image_digest == "".to_string(){
         if image_name == "".to_string() {
         // TODO 遍历记录仓库所有镜像
@@ -64,7 +68,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
                     let image_version = format!("{}",image_version_2[image_version_2.len() - 1]);
                     let image_digest = image_digest;
 
-                    let size = get_image_size_repositories(db,image_digest.clone()).await;
+                    let size = get_image_size_repositories(&db,image_digest.clone()).await;
                     let spec_item = ImageSpecItemJSONValue {
                         image_digest:image_digest.clone(),
                         annotations:HashMap::new()
@@ -133,7 +137,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
                 let image_version = format!("{}",image_version_2[image_version_2.len() - 1]);
                 let image_digest = image_digest;
 
-                let size = get_image_size_repositories(db,image_digest.clone()).await;
+                let size = get_image_size_repositories(&db,image_digest.clone()).await;
                 let spec_item = ImageSpecItemJSONValue {
                     image_digest:image_digest.clone(),
                     annotations:HashMap::new()
@@ -240,7 +244,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
             let image_name = format!("{}",image_name_version_info[0]);
             let image_version = format!("{}",image_name_version_info[1]);
 
-            let size = get_image_size_repositories(db,image_digest.clone()).await;
+            let size = get_image_size_repositories(&db,image_digest.clone()).await;
             let spec_item = ImageSpecItemJSONValue {
                 image_digest:image_digest.clone(),
                 annotations:HashMap::new()
@@ -308,7 +312,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
         let image_name = format!("{}",image_name_version_info[0]);
         let image_version = format!("{}",image_name_version_info[1]);
 
-        let size = get_image_size_repositories(db,image_digest.clone()).await;
+        let size = get_image_size_repositories(&db,image_digest.clone()).await;
         let spec_item = ImageSpecItemJSONValue {
             image_digest:image_digest.clone(),
             annotations:HashMap::new()
