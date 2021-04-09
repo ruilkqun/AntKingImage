@@ -3,9 +3,16 @@ use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::{ ImageVersionJSONValue,ImageListItemJSONValue,ImageSpecItemJSONValue };
 use crate::public_struct::{ ImageDigestToNameVersionJSONValue };
 use crate::get_image_size::get_image_size_repositories;
+use crate::utils::create_sled_db;
 
 
-pub async fn read_image_list_repositories(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> Vec<ImageListItemJSONValue> {
+pub async fn read_image_list_repositories(image_name:String,image_version:String,image_digest:String) -> Vec<ImageListItemJSONValue> {
+    let db_tmp = create_sled_db().await;
+    let db = match db_tmp{
+      Some(res) => res,
+      None => return
+    };
+
     let mut result_vec:Vec<ImageListItemJSONValue> = Vec::new();
     if image_digest == "".to_string(){
         if image_name == "".to_string() {
