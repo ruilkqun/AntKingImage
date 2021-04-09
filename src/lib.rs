@@ -30,10 +30,9 @@ pub mod get_token_dockerhub;
 pub mod get_config_dockerhub;
 pub mod get_layers_dockerhub;
 pub mod cri_server_image_pull;
-
-
-
-
+pub mod get_image_list;
+pub mod get_image_size;
+pub mod record_image_digest_image_name_version_repositories;
 
 
 // use sled::{ Config, Mode };

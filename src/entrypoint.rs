@@ -6,6 +6,7 @@ use crate::utils::{ determine_whether_image_layer_exists,compute_layer_size,comp
 use crate::record_image_digest_layerdiffid_layerdigest::{ record_image_digest_layer_diff_id_to_layer_digest,record_image_digest_layer_digest_layer_diff_id };
 use crate::get_layers::get_layers;
 use crate::record_image_repositories::record_image_repositories;
+use crate::record_image_digest_image_name_version_repositories::record_image_digest_image_name_version_repositories;
 use crate::record_image_chainid::record_image_chain_id;
 use crate::get_manifest_dockerhub::{get_manifest_info_dockerhub,Manifest as DockerManifest};
 use crate::get_config_dockerhub::{ write_config_json_dockerhub,read_config_json_dockerhub };
@@ -188,5 +189,6 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
         let image_name_version = format!("{}:{}",image_name.clone(),image_version.clone());
         println!("Download Image {} complete!",image_name_version);
         record_image_repositories(db,image_name.clone(),image_version.clone(),image_digest.clone()).await.unwrap();
+        record_image_digest_image_name_version_repositories(db,image_name.clone(),image_version.clone(),image_digest.clone()).await.unwrap();
     }
 }

@@ -18,39 +18,47 @@ pub async fn record_image_repositories(db: &sled::Db,image_name:String,image_ver
                 Some(res1) =>{
                     match res1.decode() {
                         Some(mut res2) => {
-                            res2.image_version.insert(image_name_version.clone(),image_digest.clone());
+                            let mut image_repositories = HashMap::new();
+                            image_repositories.insert(image_name_version.clone(),image_digest.clone());
+                            res2.image_version.insert(image_name.clone(),image_repositories);
                             image_repositories_json_value = ImageVersionJSONValue {
                                 image_version: res2.image_version
                             };
                         }
                         _ => {
+                            let mut result = HashMap::new();
                             let mut image_repositories = HashMap::new();
                             image_repositories.insert(image_name_version.clone(),image_digest.clone());
+                            result.insert(image_name.clone(),image_repositories);
                             image_repositories_json_value = ImageVersionJSONValue {
-                                image_version: image_repositories
+                                image_version: result
                             };
                         }
                     }
                 },
                 _ => {
-                    let mut image_repositories = HashMap::new();
-                    image_repositories.insert(image_name_version.clone(),image_digest.clone());
-                    image_repositories_json_value = ImageVersionJSONValue {
-                        image_version: image_repositories
-                    };
+                        let mut result = HashMap::new();
+                        let mut image_repositories = HashMap::new();
+                        image_repositories.insert(image_name_version.clone(),image_digest.clone());
+                        result.insert(image_name.clone(),image_repositories);
+                        image_repositories_json_value = ImageVersionJSONValue {
+                            image_version: result
+                        };
                 }
             }
         },
         Err(_) => {
-            let mut image_repositories = HashMap::new();
-            image_repositories.insert(image_name_version.clone(),image_digest.clone());
-            image_repositories_json_value = ImageVersionJSONValue {
-                image_version: image_repositories
-            };
+                    let mut result = HashMap::new();
+                    let mut image_repositories = HashMap::new();
+                    image_repositories.insert(image_name_version.clone(),image_digest.clone());
+                    result.insert(image_name.clone(),image_repositories);
+                    image_repositories_json_value = ImageVersionJSONValue {
+                        image_version: result
+                    };
         }
     };
 
-    tree.insert(image_name.clone(), &image_repositories_json_value)?;
+    tree.insert("Repositories".to_string(), &image_repositories_json_value)?;
     // let value1 = tree
     //     .get(image_name.clone())?
     //     .expect("Value not found")
