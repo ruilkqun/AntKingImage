@@ -80,7 +80,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
                         annotations:HashMap::new()
                     };
                     let mut repo_tags = Vec::new();
-                    let mut repo_digests = Vec::new();
+                    let repo_digests = Vec::new();
                     // repo_tags.push(image_version.clone());
                     // repo_digests.push(image_name.clone());
                     repo_tags.push(image_name_version.clone());
@@ -156,7 +156,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
                     annotations:HashMap::new()
                 };
                 let mut repo_tags = Vec::new();
-                let mut repo_digests = Vec::new();
+                let repo_digests = Vec::new();
                 // repo_tags.push(image_version.clone());
                 // repo_digests.push(image_name.clone());
                 repo_tags.push(image_name_version.clone());
@@ -270,7 +270,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
             };
 
             let mut repo_tags = Vec::new();
-            let mut repo_digests = Vec::new();
+            let repo_digests = Vec::new();
             // repo_tags.push(image_version.clone());
             // repo_digests.push(image_name.clone());
             repo_tags.push(image_name_version.clone());
@@ -345,7 +345,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
         };
 
         let mut repo_tags = Vec::new();
-        let mut repo_digests = Vec::new();
+        let repo_digests = Vec::new();
         // repo_tags.push(image_version.clone());
         // repo_digests.push(image_name.clone());
         repo_tags.push(image_name_version.clone());
