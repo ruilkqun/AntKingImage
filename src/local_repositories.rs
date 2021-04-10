@@ -18,7 +18,7 @@ pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:Str
     );
 
     let value = tree
-    .get(image_name.clone());
+    .get("Repositories".to_string());
 
     match value {
         Ok(res) => {
