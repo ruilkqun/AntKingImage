@@ -68,7 +68,7 @@ pub async fn get_image_digest_local(image_name:String,image_version:String) -> R
     );
 
     let value = tree
-    .get(image_name.clone());
+    .get("Repositories".to_string());
 
     match value {
         Ok(res) => {
