@@ -9,7 +9,7 @@ pub async fn record_image_repositories(db: &sled::Db,image_name:String,image_ver
     );
 
     let value = tree
-    .get(image_name.clone());
+    .get("Repositories".to_string());
 
     let  image_repositories_json_value:ImageVersionJSONValue;
     match value {
