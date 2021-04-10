@@ -137,7 +137,5 @@ Image is up to date for 192.168.1.118:8899saodiseng/nginx@sha256:6084105296a9525
 [root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  images
 IMAGE               TAG                 IMAGE ID            SIZE
 library/nginx       latest              519e12e2a84a9       137MB
-
-
 ```
 
