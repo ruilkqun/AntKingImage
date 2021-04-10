@@ -66,17 +66,24 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
                     let image_version_1 = image_name_version.split(":");
                     let image_version_2:Vec<&str> = image_version_1.collect();
                     let image_version = format!("{}",image_version_2[image_version_2.len() - 1]);
-                    let image_digest = image_digest;
 
-                    let size = get_image_size_repositories(&db,image_digest.clone()).await;
+                    // 去除sha256
+                    let image_digest_1 = image_digest.split(":");
+                    let image_digest_2:Vec<&str> = image_digest_1.collect();
+                    let image_digest_3 = format!("{}",image_digest_2[1]);
+
+                    let image_name_version= format!("{}:{}",image_name,image_version);
+
+                    let size = get_image_size_repositories(&db,image_digest_3.clone()).await;
                     let spec_item = ImageSpecItemJSONValue {
                         image_digest:image_digest.clone(),
                         annotations:HashMap::new()
                     };
                     let mut repo_tags = Vec::new();
                     let mut repo_digests = Vec::new();
-                    repo_tags.push(image_version.clone());
-                    repo_digests.push(image_name.clone());
+                    // repo_tags.push(image_version.clone());
+                    // repo_digests.push(image_name.clone());
+                    repo_tags.push(image_name_version.clone());
                     let result_item = ImageListItemJSONValue{
                         id: image_digest.clone(),
                         repo_tags,
@@ -135,17 +142,24 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
                 let image_version_1 = image_name_version.split(":");
                 let image_version_2:Vec<&str> = image_version_1.collect();
                 let image_version = format!("{}",image_version_2[image_version_2.len() - 1]);
-                let image_digest = image_digest;
 
-                let size = get_image_size_repositories(&db,image_digest.clone()).await;
+                // 去除sha256
+                let image_digest_1 = image_digest.split(":");
+                let image_digest_2:Vec<&str> = image_digest_1.collect();
+                let image_digest_3 = format!("{}",image_digest_2[1]);
+
+                let image_name_version= format!("{}:{}",image_name,image_version);
+
+                let size = get_image_size_repositories(&db,image_digest_3.clone()).await;
                 let spec_item = ImageSpecItemJSONValue {
                     image_digest:image_digest.clone(),
                     annotations:HashMap::new()
                 };
                 let mut repo_tags = Vec::new();
                 let mut repo_digests = Vec::new();
-                repo_tags.push(image_version.clone());
-                repo_digests.push(image_name.clone());
+                // repo_tags.push(image_version.clone());
+                // repo_digests.push(image_name.clone());
+                repo_tags.push(image_name_version.clone());
                 let result_item = ImageListItemJSONValue{
                     id: image_digest.clone(),
                     repo_tags,
@@ -243,8 +257,13 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
             let image_name_version_info = value.image_info[&image_digest.clone()].clone();
             let image_name = format!("{}",image_name_version_info[0]);
             let image_version = format!("{}",image_name_version_info[1]);
+            let image_name_version= format!("{}:{}",image_name,image_version);
 
-            let size = get_image_size_repositories(&db,image_digest.clone()).await;
+            // 去除sha256
+            let image_digest_1 = image_digest.split(":");
+            let image_digest_2:Vec<&str> = image_digest_1.collect();
+            let image_digest_3 = format!("{}",image_digest_2[1]);
+            let size = get_image_size_repositories(&db,image_digest_3.clone()).await;
             let spec_item = ImageSpecItemJSONValue {
                 image_digest:image_digest.clone(),
                 annotations:HashMap::new()
@@ -252,8 +271,9 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
 
             let mut repo_tags = Vec::new();
             let mut repo_digests = Vec::new();
-            repo_tags.push(image_version.clone());
-            repo_digests.push(image_name.clone());
+            // repo_tags.push(image_version.clone());
+            // repo_digests.push(image_name.clone());
+            repo_tags.push(image_name_version.clone());
             let result_item = ImageListItemJSONValue{
                 id: image_digest.clone(),
                 repo_tags,
@@ -311,8 +331,14 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
         let image_name_version_info = value.image_info[&image_digest.clone()].clone();
         let image_name = format!("{}",image_name_version_info[0]);
         let image_version = format!("{}",image_name_version_info[1]);
+        let image_name_version= format!("{}:{}",image_name,image_version);
 
-        let size = get_image_size_repositories(&db,image_digest.clone()).await;
+        // 去除sha256
+        let image_digest_1 = image_digest.split(":");
+        let image_digest_2:Vec<&str> = image_digest_1.collect();
+        let image_digest_3 = format!("{}",image_digest_2[1]);
+
+        let size = get_image_size_repositories(&db,image_digest_3.clone()).await;
         let spec_item = ImageSpecItemJSONValue {
             image_digest:image_digest.clone(),
             annotations:HashMap::new()
@@ -320,8 +346,9 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
 
         let mut repo_tags = Vec::new();
         let mut repo_digests = Vec::new();
-        repo_tags.push(image_version.clone());
-        repo_digests.push(image_name.clone());
+        // repo_tags.push(image_version.clone());
+        // repo_digests.push(image_name.clone());
+        repo_tags.push(image_name_version.clone());
         let result_item = ImageListItemJSONValue{
             id: image_digest.clone(),
             repo_tags,
