@@ -1,6 +1,8 @@
 use crate::sled_json::{ TreeWrapper, JSONEncoder };
 use crate::public_struct::{ ImageVersionJSONValue };
 use crate::utils::create_sled_db;
+use std::collections::hash_map::RandomState;
+use std::collections::HashMap;
 
 
 pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:String,image_digest:String) -> bool{
@@ -27,10 +29,26 @@ pub async fn judge_image_local(db: &sled::Db,image_name:String,image_version:Str
                     match res1.decode() {
                         None => false,
                         Some(res2) => {
-                            let search_result = res2.image_version[&image_name.clone()][image_name_version.as_str()].clone();
+                            let search_result = match res2.image_version.get(&image_name.clone()) {
+                                None => return false,
+                                Some(res) => {
+                                    match res.get(image_name_version.as_str()){
+                                        None => return false,
+                                        Some(res1) => res1
+                                    }
+                                }
+                            };
+
+                            // let search_result = match res2.image_version[&image_name.clone()][image_name_version.as_str()].clone(){
+                            //     String(res) => {res},
+                            //     Err(_) => {
+                            //         println!("This image does not exist locally！");
+                            //         return false
+                            //     }
+                            // };
                             // println!("search_result:{}",search_result.clone());
                             // println!("image_digest:{}",image_digest.clone());
-                            if search_result == image_digest {
+                            if *search_result == image_digest {
                                 true
                             }else {
                                 false
