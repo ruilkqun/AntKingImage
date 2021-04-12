@@ -64,3 +64,11 @@ pub async fn record_image_layer_diff_id_to_level(db: &sled::Db,image_digest:Stri
     // println!("image_version:{:?}",value.image_version["nginx:latest"]);
     Ok(())
 }
+
+
+
+pub async fn remove_image_layer_diff_id_to_level(db: &sled::Db,image_digest:String) -> sled::Result<()> {
+    let tree = db.open_tree("image_layer_level")?;
+    tree.remove(image_digest.clone()).unwrap();
+    Ok(())
+}

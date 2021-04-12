@@ -121,3 +121,19 @@ pub async fn record_image_digest_layer_digest_layer_diff_id(db: &sled::Db,image_
     // println!("image_version:{:?}",value.image_version["nginx:latest"]);
     Ok(())
 }
+
+
+
+
+pub async fn remove_image_digest_layer_digest_layer_diff_id(db: &sled::Db,image_digest:String) -> sled::Result<()> {
+    let tree = db.open_tree("image_digest_layerdigest_to_layerdiffid_to")?;
+    tree.remove(image_digest.clone()).unwrap();
+    Ok(())
+}
+
+
+pub async fn remove_image_digest_layer_diff_id_to_layer_digest(db: &sled::Db,image_digest:String) -> sled::Result<()> {
+    let tree = db.open_tree("image_digest_layerdiffid_to_layerdigest")?;
+    tree.remove(image_digest.clone()).unwrap();
+    Ok(())
+}

@@ -1,13 +1,13 @@
 use crate::get_manifest::{get_manifest_info,Manifest as NDockerManifest};
 use crate::local_repositories::judge_image_local;
 use crate::get_config::{ write_config_json,read_config_json };
-use crate::record_image_layer_level::record_image_layer_diff_id_to_level;
-use crate::utils::{ determine_whether_image_layer_exists,compute_layer_size,computer_layer_chain_id };
-use crate::record_image_digest_layerdiffid_layerdigest::{ record_image_digest_layer_diff_id_to_layer_digest,record_image_digest_layer_digest_layer_diff_id };
+use crate::record_image_layer_level::{ record_image_layer_diff_id_to_level,remove_image_layer_diff_id_to_level };
+use crate::utils::{ determine_whether_image_layer_exists,compute_layer_size,computer_layer_chain_id,remove_image_gz,get_completed_digest,remove_image_rootfs };
+use crate::record_image_digest_layerdiffid_layerdigest::{ record_image_digest_layer_diff_id_to_layer_digest,record_image_digest_layer_digest_layer_diff_id,remove_image_digest_layer_diff_id_to_layer_digest,remove_image_digest_layer_digest_layer_diff_id };
 use crate::get_layers::get_layers;
-use crate::record_image_repositories::record_image_repositories;
-use crate::record_image_digest_image_name_version_repositories::record_image_digest_image_name_version_repositories;
-use crate::record_image_chainid::record_image_chain_id;
+use crate::record_image_repositories::{ record_image_repositories,remove_image_repositories };
+use crate::record_image_digest_image_name_version_repositories::{ record_image_digest_image_name_version_repositories,remove_image_digest_image_name_version_repositories,get_image_name_version };
+use crate::record_image_chainid::{ record_image_chain_id,remove_image_chain_id };
 use crate::get_manifest_dockerhub::{get_manifest_info_dockerhub,Manifest as DockerManifest};
 use crate::get_config_dockerhub::{ write_config_json_dockerhub,read_config_json_dockerhub };
 use crate::get_layers_dockerhub::get_layers_dockerhub;
@@ -194,6 +194,31 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
 }
 
 
-pub async fn remove_image(db: &sled::Db,repositories_url_ip:String,image_name:String,image_version:String,username:String,password:String,docker:bool) {
+pub async fn remove_image(db: &sled::Db,image_digest:String) {
+    // 获取完整摘要
+    let image_completed_digest = get_completed_digest(image_digest.clone());
+    // 获取镜像name和version
+    let image_tuple = get_image_name_version(db,image_completed_digest.clone()).await;
+    let image_name = format!("{}",image_tuple.0);
+    let image_version = format!("{}",image_tuple.1);
 
+    // db删除镜像层diff-id与level映射关系
+    remove_image_layer_diff_id_to_level(db,image_completed_digest.clone()).await.unwrap();
+    // db删除镜像层chain_id等信息
+    remove_image_chain_id(db,image_completed_digest.clone()).await.unwrap();
+    // db删除镜像digest与image_name_version映射关系
+    remove_image_digest_image_name_version_repositories(db,image_completed_digest.clone()).await.unwrap();
+    // db删除镜像digest与diff-id映射关系
+    remove_image_digest_layer_digest_layer_diff_id(db,image_completed_digest.clone()).await.unwrap();
+    // db删除diff-id与digest映射关系
+    remove_image_digest_layer_diff_id_to_layer_digest(db,image_completed_digest.clone()).await.unwrap();
+    // db删除repositories镜像版本记录信息
+    remove_image_repositories(db,image_name.clone(),image_version.clone()).await.unwrap();
+
+    // 删除gz包
+    let remove_gz_path = format!("{}",image_digest.clone());
+    remove_image_gz(remove_gz_path.clone());
+    // 删除image包
+    let remove_rootfs_path = format!("{}",image_digest.clone());
+    remove_image_rootfs(remove_rootfs_path.clone());
 }

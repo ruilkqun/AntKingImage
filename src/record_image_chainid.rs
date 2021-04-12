@@ -81,3 +81,10 @@ pub async fn record_image_chain_id(db: &sled::Db,image_digest:String,image_chain
     // println!("image_version:{:?}",value.image_version["nginx:latest"]);
     Ok(())
 }
+
+
+pub async fn remove_image_chain_id(db: &sled::Db,image_digest:String) -> sled::Result<()> {
+    let tree = db.open_tree("image_chain_id")?;
+    tree.remove(image_digest.clone()).unwrap();
+    Ok(())
+}
