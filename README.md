@@ -1,6 +1,6 @@
 ## ant-king-image (OCI镜像拉取，存储)
 Architecture:
-![ant-king-image architecture](https://github.com/ruilkqun/ant-king-image/blob/main/architecture/image-ant-king.png)
+![ant-king-image architecture](https://github.com/ruilkqun/ant-king-image/designMode/blob/main/architecture/image-ant-king.png)
 
 ```
 A Library For Download OCI Image
