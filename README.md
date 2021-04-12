@@ -2,6 +2,9 @@
 ```
 A Library For Download OCI Image
 
+Architecture:
+![ant-king-image architecture](https://github.com/ruilkqun/ant-king-image/blob/master/architecture/image-ant-king.png)
+
 Example:
 
 1、Downloade DockerHub Image

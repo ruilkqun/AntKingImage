@@ -33,6 +33,7 @@ pub mod cri_server_image_pull;
 pub mod get_image_list;
 pub mod get_image_size;
 pub mod record_image_digest_image_name_version_repositories;
+pub mod cri_server_image_remove;
 
 
 // use sled::{ Config, Mode };
