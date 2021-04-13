@@ -301,7 +301,7 @@ pub async fn read_image_list_repositories(image_name:String,image_version:String
         tree_tmp
         );
 
-        println!("image_digest:{}",image_digest.clone());
+        // println!("image_digest:{}",image_digest.clone());
         let value_1 = match tree.get(image_digest.clone()){
             Ok(res) => res,
             Err(_) => {

@@ -9,8 +9,15 @@ use crate::utils::{ create_sled_db,get_completed_digest };
 pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> ImageListItemJSONValue {
     let image_completed_digest_no_sha256 = get_completed_digest(image_digest_no_sha256.clone());
     let image_digest = format!("sha256:{}",image_completed_digest_no_sha256.clone());
-    println!("image_digest:{}",image_digest.clone());
-
+    // println!("image_digest:{}",image_digest.clone());
+    // let image_digest1 = "sha256:519e12e2a84a9eb18094635ae1edfd97b26f95dbc66e317eefb657a1cb08c8dc".to_string();
+    // println!("image_digest:{}",image_digest.clone());
+    // println!("image_digest1:{}",image_digest1.clone());
+    // if image_digest.clone() == image_digest1.clone() {
+    //     println!("hi")
+    // }else {
+    //     println!("ha")
+    // }
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
       Some(res) => res,
@@ -19,6 +26,7 @@ pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> Im
             return result_item
       }
     };
+
 
     let tree_tmp = match db.open_tree("image_digest_name_version_repositories"){
         Ok(res) => res,
@@ -32,6 +40,7 @@ pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> Im
     tree_tmp
     );
 
+    // println!("image_digest:{}",image_digest.clone());
     let value_1 = match tree.get(image_digest.clone()){
         Ok(res) => res,
         Err(_) => {
@@ -43,7 +52,6 @@ pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> Im
     let value_2 = match value_1{
         Some(res) => res,
         None => {
-            println!("4");
             let result_item = ImageListItemJSONValue::default();
             return result_item
         }

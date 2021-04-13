@@ -134,7 +134,7 @@ Image is up to date for library/nginx@sha256:7ce4f91ef623b9672ec12302c4a710629cd
 [root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock pull --creds=admin:saodiseng harbor:192.168.1.118:8899/saodiseng/nginx:latest
 Image is up to date for 192.168.1.118:8899saodiseng/nginx@sha256:6084105296a952523c36eea261af38885f41e9d1d0001b4916fa426e45377ffe
 ```
-#### 2.1、查看镜像列表
+#### 2.2、查看镜像列表
 ```
 [root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  images
 IMAGE               TAG                 IMAGE ID            SIZE
@@ -152,5 +152,10 @@ IMAGE               TAG                 IMAGE ID            SIZE
  images --digests sha256:6084105296a952523c36eea261af38885f41e9d1d0001b4916fa426e45377ffe
 IMAGE               TAG                 DIGEST              IMAGE ID            SIZE
 /saodiseng/nginx    latest              <none>              6084105296a95       137MB
+```
+
+#### 2.3、删除镜像
+```
+[root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  rmi 519e12e2a84a9
 ```
 

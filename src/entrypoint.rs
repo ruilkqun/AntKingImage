@@ -198,28 +198,31 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
 pub async fn remove_image(db: &sled::Db,image_digest:String) {
     // 获取完整摘要
     let image_completed_digest = get_completed_digest(image_digest.clone());
+    let image_digest = format!("sha256:{}",image_completed_digest);
+    let image_digest_no_sha256 = format!("{}",image_completed_digest);
+
     // 获取镜像name和version
-    let image_tuple = get_image_name_version(db,image_completed_digest.clone()).await;
+    let image_tuple = get_image_name_version(db,image_digest.clone()).await;
     let image_name = format!("{}",image_tuple.0);
     let image_version = format!("{}",image_tuple.1);
 
-    // db删除镜像层diff-id与level映射关系
-    remove_image_layer_diff_id_to_level(db,image_completed_digest.clone()).await.unwrap();
-    // db删除镜像层chain_id等信息
-    remove_image_chain_id(db,image_completed_digest.clone()).await.unwrap();
+    // db删除镜像层diff-id与level映射关系(no sha256)
+    remove_image_layer_diff_id_to_level(db,image_digest_no_sha256.clone()).await.unwrap();
+    // db删除镜像层chain_id等信息(no sha256)
+    remove_image_chain_id(db,image_digest_no_sha256.clone()).await.unwrap();
     // db删除镜像digest与image_name_version映射关系
-    remove_image_digest_image_name_version_repositories(db,image_completed_digest.clone()).await.unwrap();
+    remove_image_digest_image_name_version_repositories(db,image_digest.clone()).await.unwrap();
     // db删除镜像digest与diff-id映射关系
-    remove_image_digest_layer_digest_layer_diff_id(db,image_completed_digest.clone()).await.unwrap();
+    remove_image_digest_layer_digest_layer_diff_id(db,image_digest.clone()).await.unwrap();
     // db删除diff-id与digest映射关系
-    remove_image_digest_layer_diff_id_to_layer_digest(db,image_completed_digest.clone()).await.unwrap();
+    remove_image_digest_layer_diff_id_to_layer_digest(db,image_digest.clone()).await.unwrap();
     // db删除repositories镜像版本记录信息
     remove_image_repositories(db,image_name.clone(),image_version.clone()).await.unwrap();
 
-    // 删除gz包
-    let remove_gz_path = format!("{}",image_digest.clone());
+    // 删除gz包(no sha256)
+    let remove_gz_path = format!("{}",image_digest_no_sha256.clone());
     remove_image_gz(remove_gz_path.clone());
-    // 删除image包
-    let remove_rootfs_path = format!("{}",image_digest.clone());
+    // 删除image包(no sha256)
+    let remove_rootfs_path = format!("{}",image_digest_no_sha256.clone());
     remove_image_rootfs(remove_rootfs_path.clone());
 }

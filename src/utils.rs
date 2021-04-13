@@ -123,7 +123,7 @@ pub fn computer_layer_chain_id(layer_parent_chain_id:String,layer_diff_id:String
 pub fn get_completed_digest(short_digest:String) -> String{
     let cmd = format!("ls /var/lib/AntKing/gz/ | grep {}",short_digest.clone());
     let output = Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
-    let result = String::from_utf8(output.stdout).unwrap();
+    let result = format!("{}",String::from_utf8(output.stdout).unwrap().trim());
     return result
 }
 
