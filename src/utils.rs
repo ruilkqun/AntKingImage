@@ -121,7 +121,7 @@ pub fn computer_layer_chain_id(layer_parent_chain_id:String,layer_diff_id:String
 
 
 pub fn get_completed_digest(short_digest:String) -> String{
-    let cmd = format!("ls /var/lib/AntKingImage/gz/ | gerp {}",short_digest.clone());
+    let cmd = format!("ls /var/lib/AntKing/gz/ | grep {}",short_digest.clone());
     let output = Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
     let result = String::from_utf8(output.stdout).unwrap();
     return result
@@ -129,12 +129,12 @@ pub fn get_completed_digest(short_digest:String) -> String{
 
 
 pub fn remove_image_gz(path:String) {
-    let cmd = format!("ls /var/lib/AntKingImage/gz/ | gerp {} | xargs  -I xx  sh -c \"rm -rf /var/lib/AntKingImage/gz/xx\"",path.clone());
+    let cmd = format!("ls /var/lib/AntKing/gz/ | grep {} | xargs  -I xx  sh -c \"rm -rf /var/lib/AntKingImage/gz/xx\"",path.clone());
     Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
 }
 
 
 pub fn remove_image_rootfs(path:String) {
-    let cmd = format!("ls /var/lib/AntKingImage/images/ | gerp {} | xargs  -I xx  sh -c \"rm -rf /var/lib/AntKingImage/images/xx\"",path.clone());
+    let cmd = format!("ls /var/lib/AntKing/images/ | grep {} | xargs  -I xx  sh -c \"rm -rf /var/lib/AntKingImage/images/xx\"",path.clone());
     Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
 }
