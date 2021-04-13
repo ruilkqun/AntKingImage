@@ -159,3 +159,26 @@ IMAGE               TAG                 DIGEST              IMAGE ID            
 [root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  rmi 519e12e2a84a9
 ```
 
+#### 2.4、查看镜像信息
+```
+[root@localhost container]# crictl --image-endpoint unix:///var/run/saodiseng.sock  inspecti 6084105296a95
+{
+  "status": {
+    "id": "sha256:6084105296a952523c36eea261af38885f41e9d1d0001b4916fa426e45377ffe",
+    "repoTags": [
+      "/saodiseng/nginx:latest"
+    ],
+    "repoDigests": [],
+    "size": "137318912",
+    "uid": {
+      "value": "1000"
+    },
+    "username": "root",
+    "spec": {
+      "image": "sha256:6084105296a952523c36eea261af38885f41e9d1d0001b4916fa426e45377ffe",
+      "annotations": {}
+    }
+  }
+}
+```
+
