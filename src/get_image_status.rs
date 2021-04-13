@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use crate::sled_json::{ TreeWrapper, JSONEncoder };
-use crate::public_struct::{ ImageVersionJSONValue,ImageListItemJSONValue,ImageSpecItemJSONValue };
+use crate::public_struct::{ ImageListItemJSONValue,ImageSpecItemJSONValue };
 use crate::public_struct::{ ImageDigestToNameVersionJSONValue };
 use crate::get_image_size::get_image_size_repositories;
 use crate::utils::{ create_sled_db,get_completed_digest };
