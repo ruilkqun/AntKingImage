@@ -91,6 +91,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             }
         };
 
+        // 读config.json配置文件 镜像摘要不要带sha256
         let config_info = match !docker {
             true =>   read_config_json(image_digest_no_sha256.clone()).await,
             false =>  read_config_json_dockerhub(image_digest_no_sha256.clone()).await
@@ -129,7 +130,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             layer_vec.push(layer_digest1_no_sha256.clone());
             layer_vec.push(layer_diff_id.clone());
 
-            // 判断 本地layer层是否存在标记
+            // 判断 本地layer层是否存在标记 镜像摘要不要带sha256
             let whether_image_layer = determine_whether_image_layer_exists(db,image_digest_no_sha256.clone(),layer_diff_id.clone());
             if whether_image_layer{
                 continue
@@ -182,7 +183,7 @@ pub async fn pull_image(db: &sled::Db,repositories_url_ip:String,image_name:Stri
             // 计算层size
             let path = format!("/var/lib/AntKing/gz/{}/{}.tar", item["item"][0.clone()], item["item"][1].clone());
             let size = compute_layer_size(path.clone());
-            // 记录chain_id
+            // 记录chain_id 镜像摘要不要带sha256
             record_image_chain_id(db, item["item"][0].clone(), item["item"][3].clone(), item["item"][2].clone(), item["item"][2].clone(), item["item"][4].clone(), size).await.unwrap();
         }
         // 数据库记录镜像
