@@ -9,6 +9,7 @@ use crate::utils::{ create_sled_db,get_completed_digest };
 pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> ImageListItemJSONValue {
     let image_completed_digest_no_sha256 = get_completed_digest(image_digest_no_sha256.clone());
     let image_digest = format!("sha256:{}",image_completed_digest_no_sha256);
+    println!("image_digest:{}",image_digest);
 
 
     let db_tmp = create_sled_db().await;

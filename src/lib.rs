@@ -58,3 +58,9 @@ pub mod get_image_status;
 //
 //     Ok(())
 // }
+
+// #[tokio::main]
+// pub async fn main() {
+//     let reply_tmp = get_image_status::read_image_status_repositories("519e12e2a84a9".to_string()).await;
+//     println!("{:?}",reply_tmp);
+// }
