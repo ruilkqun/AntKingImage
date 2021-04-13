@@ -8,9 +8,8 @@ use crate::utils::{ create_sled_db,get_completed_digest };
 
 pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> ImageListItemJSONValue {
     let image_completed_digest_no_sha256 = get_completed_digest(image_digest_no_sha256.clone());
-    let image_digest = format!("sha256:{}",image_completed_digest_no_sha256);
-    println!("image_digest:{}",image_digest);
-
+    let image_digest = format!("sha256:{}",image_completed_digest_no_sha256.clone());
+    println!("image_digest:{}",image_digest.clone());
 
     let db_tmp = create_sled_db().await;
     let db = match db_tmp{
@@ -21,7 +20,6 @@ pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> Im
       }
     };
 
-    //  TODO 摘要不为空，直接计算size
     let tree_tmp = match db.open_tree("image_digest_name_version_repositories"){
         Ok(res) => res,
         Err(_) => {
@@ -45,6 +43,7 @@ pub async fn read_image_status_repositories(image_digest_no_sha256:String) -> Im
     let value_2 = match value_1{
         Some(res) => res,
         None => {
+            println!("4");
             let result_item = ImageListItemJSONValue::default();
             return result_item
         }
