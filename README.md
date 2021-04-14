@@ -182,7 +182,7 @@ IMAGE               TAG                 DIGEST              IMAGE ID            
 }
 ```
 
-## 查看镜像文件系统信息
+#### 2.5、查看镜像文件系统信息
 ```
 [root@localhost ~]# crictl --image-endpoint unix:///var/run/saodiseng.sock  imagefsinfo
 {
