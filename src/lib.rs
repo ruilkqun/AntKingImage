@@ -62,9 +62,12 @@ pub mod cri_server_image_fs_info;
 
 // #[tokio::main]
 // pub async fn main() {
-//     let reply_tmp = get_image_status::read_image_status_repositories("519e12e2a84a9".to_string()).await;
-//     println!("{:?}",reply_tmp);
-//
-//     let reply_tmp1 = get_image_list::read_image_list_repositories("".to_string(),"".to_string(),"sha256:519e12e2a84a9eb18094635ae1edfd97b26f95dbc66e317eefb657a1cb08c8dc".to_string()).await;
-//     println!("{:?}",reply_tmp1)
+    // let reply_tmp = get_image_status::read_image_status_repositories("519e12e2a84a9".to_string()).await;
+    // println!("{:?}",reply_tmp);
+    //
+    // let reply_tmp1 = get_image_list::read_image_list_repositories("".to_string(),"".to_string(),"sha256:519e12e2a84a9eb18094635ae1edfd97b26f95dbc66e317eefb657a1cb08c8dc".to_string()).await;
+    // println!("{:?}",reply_tmp1)
+
+//     let reply_tmp2 = utils::computer_fs_info();
+//     println!("{:?}",reply_tmp2);
 // }
