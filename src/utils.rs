@@ -138,3 +138,21 @@ pub fn remove_image_rootfs(path:String) {
     let cmd = format!("ls /var/lib/AntKing/images/ | grep {} | xargs  -I xx  sh -c \"rm -rf /var/lib/AntKingImage/images/xx\"",path.clone());
     Command::new("sh").arg("-c").arg(cmd.clone()).output().unwrap();
 }
+
+
+pub fn computer_fs_info() -> (u64,u64) {
+    let mut used_bytes:u64 = 0;
+    let mut inodes_used:u64 = 0;
+
+    let cmd1 = "du -shb /var/lib/AntKing/".to_string();
+    let output = Command::new("sh").arg("-c").arg(cmd1.clone()).output().unwrap();
+    let used_bytes_1 = format!("{}",String::from_utf8(output.stdout).unwrap().trim());
+    used_bytes = used_bytes_1.parse::<u64>().unwrap();
+
+    let cmd2 = "stat /var/lib/AntKing/ | grep Inode | awk '{print $2}' | cut -c 7-".to_string();
+    let output = Command::new("sh").arg("-c").arg(cmd2.clone()).output().unwrap();
+    let inodes_used_1 = format!("{}",String::from_utf8(output.stdout).unwrap().trim());
+    inodes_used = inodes_used_1.parse::<u64>().unwrap();
+
+    return (used_bytes,inodes_used)
+}
