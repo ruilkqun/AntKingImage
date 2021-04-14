@@ -182,3 +182,22 @@ IMAGE               TAG                 DIGEST              IMAGE ID            
 }
 ```
 
+## 查看镜像文件系统信息
+```
+[root@localhost ~]# crictl --image-endpoint unix:///var/run/saodiseng.sock  imagefsinfo
+{
+  "status": {
+    "timestamp": "1618385746189724737",
+    "fsId": {
+      "mountpoint": "/"
+    },
+    "usedBytes": {
+      "value": "547010913"
+    },
+    "inodesUsed": {
+      "value": "71199008"
+    }
+  }
+}
+```
+
